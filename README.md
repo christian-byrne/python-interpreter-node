@@ -63,6 +63,7 @@
       - *FAILED*: It just doesn't work for some reason. The assignment still just creates a new local variable in the `exec` scope instead of being caught by the overloaded `__setattr__` method of the singleton. No idea why. 
     - Regex replace assignments with setter method calls
     - Create new method to replace assignments and leave it to the user to use it
+- [ ] Decide whether to try to splice/parse `return` statements and values and dynamically add them to UI in real-time 
 - [ ] Test core features
 - [ ] Document
 - [ ] Finalize version without the tensor wrapper

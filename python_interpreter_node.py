@@ -4,12 +4,12 @@ from io import StringIO
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
-    from .wrapper_class import TensorWrapper
+    from .image_tensor_wrapper import TensorWrapper
 except ImportError:
     import sys
 
     sys.path.append("..")
-    from wrapper_class import TensorWrapper
+    from image_tensor_wrapper import TensorWrapper
 
 
 class PythonInterpreter:
@@ -103,13 +103,6 @@ class PythonInterpreter:
         "STRING",
     )
 
-    def splice_return_statments(self, code_lines: List[str]):
-        returns = [line for line in code_lines if line.strip().startswith("return")]
-        non_returns = [
-            line for line in code_lines if not line.strip().startswith("return")
-        ]
-        return non_returns, returns
-
     def run(
         self,
         python_code: str,
@@ -136,58 +129,95 @@ class PythonInterpreter:
         self.text1 = text1
         self.text2 = text2
 
-        code_lines, return_statements = self.splice_return_statments(
+        code_lines, return_statements = self.__splice_return_statments(
             python_code.split("\n")
         )
         return_variables = [statement.split()[1] for statement in return_statements]
         # TODO: stateful dummy return instances. capture additional return values and append to outputs
 
         code = "\n".join(code_lines)
-        code = compile(code, "<string>", "exec")
+        compiled_code = compile(compiled_code, "<string>", "exec")
+        error_messages = []
+        shared_ref_dict = {
+            "image1": self.image1,
+            "image2": self.image2,
+            "mask1": self.mask1,
+            "mask2": self.mask2,
+            "number1": self.number1,
+            "number2": self.number2,
+            "text1": self.text1,
+            "text2": self.text2,
+        }
+        try_imports = [
+            "torch", "numpy", "random", "time", "os", "sys", "math", "re", "json", "csv", "collections", "itertools",
+        ]
+        try_imports = "\n".join([f"import {lib}" for lib in try_imports])
 
         # Look at the optimization: https://github.com/python/cpython/blob/3.12/Lib/timeit.py
         try:
             f = StringIO()
             err = StringIO()
-            with redirect_stdout(f), redirect_stderr(err):
-                try:
+            try:
+                with redirect_stdout(f), redirect_stderr(err):
                     exec(
-                        code,
-                        {
-                            "image1": self.image1,
-                            "image2": self.image2,
-                            "mask1": self.mask1,
-                            "mask2": self.mask2,
-                            "number1": self.number1,
-                            "number2": self.number2,
-                            "text1": self.text1,
-                            "text2": self.text2,
-                        },
+                        compiled_code,
+                        shared_ref_dict,
                     )
-                except RuntimeError as e:
-                    print(e)
-                except SyntaxError as e:
-                    # TODO: Linting hint
-                    print(e)
-                except TypeError as e:
-                    # trying to reference the variable for an input variable but the input was not piped
-                    # TODO: tensor wrapper ignore, operator overloading issue
-                    print(e)
+            except RuntimeError as e:
+                error_messages.extend([
+                    "\nRuntime Error: Check that your code is not causing an infinite loop or that it is not using too much memory.",
+                    str(e) + "\n",
+                ])
+                print(e)
+            except SyntaxError as e:
+                # TODO: Add linter and Linting hint
+                print(e)
+            except TypeError as e:
+                error_messages.extend([
+                    "\nType Error: If you are referencing an input variable, make sure you are actually piping something in to that slot and that the value is of the correct type. If you want to reference an image/mask's tensor, use the tensor attribute (e.g., image1.tensor).",
+                    str(e) + "\n",
+                ])
+                print(e)
+            except ImportError as e:
+                compiled_code = compile(f"{try_imports}\n{code}", "<string>", "exec")
+                try:
+                    with redirect_stdout(f), redirect_stderr(err):
+                        exec(
+                            compiled_code,
+                            shared_ref_dict,
+                        )
                 except ImportError as e:
-                    # TODO: handle import space/python version
+                    error_messages.extend([
+                        "\nImport Error: Don't forget to import any libraries used in your code. Use pip install to install any missing libraries.",
+                        str(e) + "\n",
+                    ])
                     print(e)
-                except (AttributeError, NameError, ValueError) as e:
-                    # TODO: change namespace/context, fuzzy match variable mismatch,
-                    #   hint: dont change names of input variables from how they appear in the UI
-                    print(e)
+            except (AttributeError, NameError, ValueError) as e:
+                error_messages.extend([
+                    "\nName Error: Check that the variable names used in your code match the input variables. Don't try to change the names of the input variables from how they appear in the UI.",
+                    str(e) + "\n",
+                ])
+                # TODO: fuzzy match variable mismatch,
+                print(e)
 
         except IOError as e:
-            # globals
-            # Try changing newline char, try changing encoding, try tempfile, try singleton, try changing file mode
+            # Can also try tempfile or changing filemode
+            compiled_code = compile(code.replace("\n", "\r\n"), "<string>", "exec")
+            with redirect_stdout(f), redirect_stderr(err):
+                exec(
+                    compiled_code,
+                    shared_ref_dict,
+                )
+
             print(e)
         except Exception as e:
+            error_messages.extend([
+                "\nUnknown Error: Something went wrong. Check the error message for more details.",
+                str(e) + "\n",
+            ])
             print(e)
 
+        stdout_display = f"{f.getvalue()}\n{err.getvalue()}\n{'\n'.join(error_messages)}"
         result = (
             self.image1.resolve(),
             self.image2.resolve(),
@@ -199,12 +229,13 @@ class PythonInterpreter:
             self.text2,
         )
         return {
-            "ui": {
-                "text": (
-                    f"{f.getvalue()}\n{err.getvalue()}"
-                    if give_full_error_stack
-                    else f.getvalue()
-                )
-            },
+            "ui": {"text": stdout_display},
             "result": result,
         }
+
+    def __splice_return_statments(self, code_lines: List[str]):
+        returns = [line for line in code_lines if line.strip().startswith("return")]
+        non_returns = [
+            line for line in code_lines if not line.strip().startswith("return")
+        ]
+        return non_returns, returns

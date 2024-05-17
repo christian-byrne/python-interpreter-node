@@ -1,5 +1,5 @@
 
-from .python_node import PythonInterpreter 
+from .python_interpreter_node import PythonInterpreter 
         
 
 NODE_CLASS_MAPPINGS = {
@@ -7,7 +7,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "Python Interpreter": "Python Interpreter"
+    "Python Interpreter": "Python code scripting debug tool"
 }
 
 WEB_DIRECTORY = "./web"
