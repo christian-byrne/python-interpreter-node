@@ -1,5 +1,14 @@
 # Python Interpreter ComfyUI Node
 
+...Work in Progress (5/17/24). Features Implemented so Far:
+- [x] Code execution
+- [x] Stdout/err display
+- [x] Input value modification and output
+- [ ] Output value assignment/pipe (an output value not associated with an input)
+- [ ] Code editor plugin
+- [ ] Dynamic inputs/outputs
+- [ ] Testing and Docs
+
 **Description**:
 
 - Allows you to write Python code in the textarea of the node. When the node is executed, the code is run in a Python interpreter. 
