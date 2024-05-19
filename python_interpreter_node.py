@@ -1,17 +1,13 @@
 import torch
 from typing import Optional, List, Union
 from contextlib import redirect_stdout, redirect_stderr
-
-try:
-    from .image_tensor_wrapper import TensorWrapper
-    from .stream_wrapper import StandardStreamWrapper
-except ImportError:
-    import sys
-
-    sys.path.append("..")
-    from image_tensor_wrapper import TensorWrapper
-    from stream_wrapper import StandardStreamWrapper
-
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from .string_wrapper import StringWrapper
+from .number_wrapper import NumberWrapper
+from .image_tensor_wrapper import TensorWrapper
+from .stream_wrapper import StandardStreamWrapper
 
 class PythonInterpreter:
     CODE_PLACEHOLDER = "\n".join(
@@ -118,10 +114,10 @@ class PythonInterpreter:
         self.image2 = TensorWrapper(image2)
         self.mask1 = TensorWrapper(mask1)
         self.mask2 = TensorWrapper(mask2)
-        self.number1 = number1
-        self.number2 = number2
-        self.text1 = text1
-        self.text2 = text2
+        self.number1 = NumberWrapper(number1)
+        self.number2 = NumberWrapper(number2)
+        self.text1 = StringWrapper(text1)
+        self.text2 = StringWrapper(text2)
 
         code_lines, return_statements = self.__splice_return_statments(
             python_code.split("\n")
@@ -147,10 +143,10 @@ class PythonInterpreter:
             self.image2.resolve(),
             self.mask1.resolve(),
             self.mask2.resolve(),
-            self.number1,
-            self.number2,
-            self.text1,
-            self.text2,
+            self.number1.resolve(),
+            self.number2.resolve(),
+            self.text1.resolve(),
+            self.text2.resolve(),
         )
         return {
             "ui": {"text": str(self.out_streams)},

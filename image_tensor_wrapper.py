@@ -1,11 +1,16 @@
 import torch
 import numpy
 from PIL import Image
-from typing import Union
+from typing import Union, Any
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from .wrapper_interface import Wrapper
 
 
-class TensorWrapper:
-    def __init__(self, tensor):
+class TensorWrapper(Wrapper):
+    def __init__(self, tensor: Union[torch.Tensor, numpy.ndarray, Image.Image]):
         if not isinstance(tensor, torch.Tensor):
             if isinstance(tensor, numpy.ndarray):
                 self.tensor = torch.from_numpy(tensor)
@@ -24,6 +29,12 @@ class TensorWrapper:
             self.dim = tensor.dim()
         else:
             self.shape, self.dim = self.null_msg, self.null_msg
+
+    def to(self, tensor: Union[torch.Tensor, Wrapper]):
+        if isinstance(tensor, torch.Tensor):
+            self.tensor = tensor
+        elif isinstance(tensor, Wrapper):
+            self.tensor = tensor.resolve()
 
     def subtract(self, other):
         """
@@ -138,15 +149,14 @@ class TensorWrapper:
         return isinstance(self.tensor, torch.Tensor)
 
     def resolve(self):
-        # TODO:
         return self.tensor
 
     def __repr__(self):
-        return f"ImageTensorWrapper({self.shape})"
+        return f"ImageTensorWrapper(tensor: {self.tensor}, shape: {self.shape}, dim: {self.dim}, dtype: {self.tensor.dtype}, device: {self.tensor.device})"
 
     def __str__(self):
         if self.tensor is not None:
-            return f"ImageTensorWrapper(shape: {self.shape}, dim: {self.dim}, dtype: {self.tensor.dtype}, device: {self.tensor.device})"
+            return f"ImageTensorWrapper(tensor.shape: {self.shape}, dim: {self.dim}, dtype: {self.tensor.dtype}, device: {self.tensor.device})"
         return "NoneType"
 
     # def __floor__(self):

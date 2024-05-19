@@ -11,9 +11,10 @@ Features Implemented so Far:
 
 ### Description
 
-- Allows you to write Python code in the textarea of the node. When the node is executed, the code is run in a Python interpreter. 
-- The stdout (includes print() statements, errors, evals, etc.) is displayed in the node. 
-- The input values can be accessed by name in the code. The output values can be set by assigning to them in the code.
+- Allows you to write Python code in the textarea of the node which executes when the workflow is queued
+- The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
+- The input values can be accessed by their UI name. 
+- The output values can be set by assigning to their UI-names.
 
 ![alt text](wiki/pictures/demos/p1-zoom.png)
 
