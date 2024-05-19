@@ -1,11 +1,12 @@
 import { app } from "../../../scripts/app.js";
 import { ComfyWidgets } from "../../../scripts/widgets.js";
 
-// Displays output caption text
+// Displays stdout/err text on the node
 app.registerExtension({
   name: "PythonInterpreter",
   async beforeRegisterNodeDef(nodeType, nodeData, app) {
-    if (nodeData.name === "Python Interpreter") {
+    console.log(nodeData.name)
+    if (nodeData.name == "Exec Python Code Script") {
       function populate(message) {
         const insertIndex = this.widgets.findIndex((w) => w.name === "output_text");
         if (insertIndex !== -1) {

@@ -1,15 +1,16 @@
 import torch
 from typing import Optional, List, Union
-from io import StringIO
 from contextlib import redirect_stdout, redirect_stderr
 
 try:
     from .image_tensor_wrapper import TensorWrapper
+    from .stream_wrapper import StandardStreamWrapper
 except ImportError:
     import sys
 
     sys.path.append("..")
     from image_tensor_wrapper import TensorWrapper
+    from stream_wrapper import StandardStreamWrapper
 
 
 class PythonInterpreter:
@@ -65,16 +66,10 @@ class PythonInterpreter:
                         "default": "hello world",
                     },
                 ),
-                "give_full_error_stack": (
+                "verbose": (
                     "BOOLEAN",
                     {
-                        "default": False,
-                    },
-                ),
-                "use_wrapper_class": (
-                    "BOOLEAN",
-                    {
-                        "default": False,
+                        "default": True,
                     },
                 ),
             },
@@ -114,8 +109,7 @@ class PythonInterpreter:
         number2: Optional[Union[float, int, complex]] = None,
         text1: Optional[str] = None,
         text2: Optional[str] = None,
-        give_full_error_stack: bool = False,
-        use_wrapper_class: bool = False,
+        verbose: bool = True,
         output_text: str = "",
         unique_id=None,
         extra_pnginfo=None,
@@ -133,12 +127,10 @@ class PythonInterpreter:
             python_code.split("\n")
         )
         return_variables = [statement.split()[1] for statement in return_statements]
-        # TODO: stateful dummy return instances. capture additional return values and append to outputs
+        # TODO: return instances. capture additional return values and append to outputs
 
         code = "\n".join(code_lines)
-        compiled_code = compile(compiled_code, "<string>", "exec")
-        error_messages = []
-        shared_ref_dict = {
+        self.shared_ref_dict = {
             "image1": self.image1,
             "image2": self.image2,
             "mask1": self.mask1,
@@ -148,76 +140,8 @@ class PythonInterpreter:
             "text1": self.text1,
             "text2": self.text2,
         }
-        try_imports = [
-            "torch", "numpy", "random", "time", "os", "sys", "math", "re", "json", "csv", "collections", "itertools",
-        ]
-        try_imports = "\n".join([f"import {lib}" for lib in try_imports])
-
-        # Look at the optimization: https://github.com/python/cpython/blob/3.12/Lib/timeit.py
-        try:
-            f = StringIO()
-            err = StringIO()
-            try:
-                with redirect_stdout(f), redirect_stderr(err):
-                    exec(
-                        compiled_code,
-                        shared_ref_dict,
-                    )
-            except RuntimeError as e:
-                error_messages.extend([
-                    "\nRuntime Error: Check that your code is not causing an infinite loop or that it is not using too much memory.",
-                    str(e) + "\n",
-                ])
-                print(e)
-            except SyntaxError as e:
-                # TODO: Add linter and Linting hint
-                print(e)
-            except TypeError as e:
-                error_messages.extend([
-                    "\nType Error: If you are referencing an input variable, make sure you are actually piping something in to that slot and that the value is of the correct type. If you want to reference an image/mask's tensor, use the tensor attribute (e.g., image1.tensor).",
-                    str(e) + "\n",
-                ])
-                print(e)
-            except ImportError as e:
-                compiled_code = compile(f"{try_imports}\n{code}", "<string>", "exec")
-                try:
-                    with redirect_stdout(f), redirect_stderr(err):
-                        exec(
-                            compiled_code,
-                            shared_ref_dict,
-                        )
-                except ImportError as e:
-                    error_messages.extend([
-                        "\nImport Error: Don't forget to import any libraries used in your code. Use pip install to install any missing libraries.",
-                        str(e) + "\n",
-                    ])
-                    print(e)
-            except (AttributeError, NameError, ValueError) as e:
-                error_messages.extend([
-                    "\nName Error: Check that the variable names used in your code match the input variables. Don't try to change the names of the input variables from how they appear in the UI.",
-                    str(e) + "\n",
-                ])
-                # TODO: fuzzy match variable mismatch,
-                print(e)
-
-        except IOError as e:
-            # Can also try tempfile or changing filemode
-            compiled_code = compile(code.replace("\n", "\r\n"), "<string>", "exec")
-            with redirect_stdout(f), redirect_stderr(err):
-                exec(
-                    compiled_code,
-                    shared_ref_dict,
-                )
-
-            print(e)
-        except Exception as e:
-            error_messages.extend([
-                "\nUnknown Error: Something went wrong. Check the error message for more details.",
-                str(e) + "\n",
-            ])
-            print(e)
-
-        stdout_display = f"{f.getvalue()}\n{err.getvalue()}\n{'\n'.join(error_messages)}"
+        self.out_streams = StandardStreamWrapper(verbose)
+        self.__exec_code(code)
         result = (
             self.image1.resolve(),
             self.image2.resolve(),
@@ -229,9 +153,23 @@ class PythonInterpreter:
             self.text2,
         )
         return {
-            "ui": {"text": stdout_display},
+            "ui": {"text": str(self.out_streams)},
             "result": result,
         }
+
+    def __exec_code(self, code_raw_text: str):
+        # Look at the optimization: https://github.com/python/cpython/blob/3.12/Lib/timeit.py
+        compiled_code = compile(code_raw_text, "<string>", "exec")
+        try:
+            with redirect_stdout(self.out_streams.get_out_io()), redirect_stderr(
+                self.out_streams.get_err_io()
+            ):
+                exec(
+                    compiled_code,
+                    self.shared_ref_dict,
+                )
+        except Exception as e:
+            self.out_streams.write_err(e)
 
     def __splice_return_statments(self, code_lines: List[str]):
         returns = [line for line in code_lines if line.strip().startswith("return")]
