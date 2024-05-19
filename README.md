@@ -49,7 +49,7 @@ Features Implemented so Far:
     print(number1 * random.randint(0, 99))
     ```
 - The output values share the same names as the input values. Changes you make to these variables will be reflected in the output values.
-- The code will work as expected in almost all cases except for 1. re-assignment and 2. passing the variables as arguments to functions.
+- The code will work as expected in almost all cases except for i. re-assignment and ii. passing the variables as arguments to functions.
   1.  To re-assign a variable, you must use its `to()` method, regardless of the variable's type
       ```python
       # Instead of number1 = float(number1):
@@ -68,12 +68,15 @@ Features Implemented so Far:
       number1++
       text1 += " is good"
       ```
-  2. To pass the variables as arguments to functions, just pass the `.data` attribute of the variable instead
+  2. To pass the variables as arguments to functions, just pass the `.data` attribute of the variable instead (regardless of the variable's type)
       ```python
       # Instead of pil_img = ToPILImage()(image1):
       pil_img = ToPILImage()(image1.data)
 
+      # Instead of random.sample[number1, number2]:
+      random.sample([number1.data, number2.data])
+
       # Not necessary for built-in functions
-      print(image1)
-      print(len(text1))
+      print(image1) # works
+      print(len(text1)) # works
       ```
