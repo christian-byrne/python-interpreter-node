@@ -18,7 +18,7 @@
 - Allows you to write Python code in the textarea of the node which executes when the workflow is queued
 - The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
 - The input values can be accessed by their UI name. 
-- The output values can be set by assigning to their UI-names.
+- The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.
 
 Features Implemented so Far:
 - [x] Code execution (5/16)
@@ -29,8 +29,6 @@ Features Implemented so Far:
 - [ ] Dynamic inputs/outputs
 - [ ] Testing and Docs
 
-
-
 ## Reason to Use
 
 - Anything that can be done with Python code
@@ -40,6 +38,7 @@ Features Implemented so Far:
 - Doing math with input values
 - Debugging
 - Testing custom nodes faster.
+- Even if you can't code, you can ask ChatGPT to write a python snippet for you to accomplish a tedious task
 
 
 ## Usage
