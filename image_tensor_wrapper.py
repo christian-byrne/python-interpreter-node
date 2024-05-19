@@ -74,17 +74,6 @@ class TensorWrapper(Wrapper):
         else:
             setattr(self.data, attr, value)
 
-    def __getitem__(self, key):
-        if key in self.parent_attributes:
-            return getattr(self, key)
-        return self.data[key]
-
-    def __setitem__(self, key, value):
-        if key in self.parent_attributes:
-            setattr(self, key, value)
-        else:
-            self.data[key] = value
-
     def __delattr__(self, attr):
         if attr in self.parent_attributes:
             delattr(self, attr)
@@ -170,6 +159,9 @@ class TensorWrapper(Wrapper):
         if isinstance(other, Wrapper):
             return self.data >= other.data
         return self.data >= other
+
+    def __getitem__(self, key):
+        return self.data[key]
 
     def __getstate__(self):
         return self.data.__getstate__()
@@ -430,7 +422,11 @@ class TensorWrapper(Wrapper):
     def __rxor__(self, other):
         if isinstance(other, Wrapper):
             return self.__class__(other.data ^ self.data)
+
         return self.__class__(other ^ self.data)
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
 
     def __setstate__(self, state):
         self.data.__setstate__(state)

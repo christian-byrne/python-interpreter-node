@@ -12,12 +12,9 @@ from .stream_wrapper import StandardStreamWrapper
 class PythonInterpreter:
     CODE_PLACEHOLDER = "\n".join(
         [
-            "# Write your code here.",
-            "# Use image1.tensor to get the raw tensor",
-            "# Don't re-assign input variables using = operator",
-            "# \tInstead, use .to() (like, image1.to(image1 * mask1))"
-            "# \tOr use in-place operators (e.g., -=, +=, *=, **=, //=, /=)",
-            "# \tHowever, you can change the input variables attributes per usual",
+            "# For any of the variables, you must use .to() to change the value",
+            "# E.g., image1.to(torch.rand(3, 3))",
+            "#       number1.to(3.14)",
         ]
     )
 
@@ -53,13 +50,13 @@ class PythonInterpreter:
                 "text1": (
                     "STRING",
                     {
-                        "default": "hello world",
+                        "default": "",
                     },
                 ),
                 "text2": (
                     "STRING",
                     {
-                        "default": "hello world",
+                        "default": "",
                     },
                 ),
                 "verbose": (
@@ -178,8 +175,10 @@ class PythonInterpreter:
             self.out_streams.write_err(e)
 
     def __splice_return_statments(self, code_lines: List[str]):
-        returns = [line for line in code_lines if line.strip().startswith("return")]
+        """Don't remove nested returns"""
+        returns = [line for line in code_lines if line.startswith("return")]
         non_returns = [
-            line for line in code_lines if not line.strip().startswith("return")
+            line for line in code_lines if not line.startswith("return")
         ]
         return non_returns, returns
+

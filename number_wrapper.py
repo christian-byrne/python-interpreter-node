@@ -8,7 +8,6 @@ from .wrapper_interface import Wrapper
 class NumberWrapper(Wrapper):
     def __init__(self, value):
         self.set_value(value)
-        print(f"NumberWrapper: {value} is of type {self.__type}")
 
     def set_value(self, value):
         # TODO: from hex, from oct, from bin

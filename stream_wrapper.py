@@ -27,16 +27,14 @@ class StandardStreamWrapper:
 
     def write_err(self, err: Exception) -> None:
         if self.also_print_system:
-            traceback.print_exc(
-                limit=1,
-            )
+            traceback.print_exc()
 
         exception_name = err.__class__.__name__
 
         if exception_name in self.hints:
             self.hint_messages.append(f"{exception_name}: {self.hints[exception_name]}")
         if self.full_traceback:
-            self.hint_messages.append(traceback.format_exc(limit=1))
+            self.hint_messages.append(traceback.format_exc())
         else:
             self.hint_messages.append(str(err))
 
@@ -48,7 +46,7 @@ class StandardStreamWrapper:
         if out_text:
             out += f"Output:\n{out_text}\n"
         if err_text:
-            out += f"Error:\n{err_text}\n"
+            out += f"\nError:\n{err_text}\n"
         if hint_text:
-            out += f"Hint:\n{hint_text}\n"
+            out += f"\nHint:\n{hint_text}\n"
         return out
