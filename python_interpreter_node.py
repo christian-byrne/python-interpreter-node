@@ -93,6 +93,16 @@ class PythonInterpreter:
         "STRING",
         "STRING",
     )
+    RETURN_NAMES = (
+        "image1",
+        "image2",
+        "mask1",
+        "mask2",
+        "number1",
+        "number2",
+        "text1",
+        "text2",
+    )
 
     def run(
         self,
