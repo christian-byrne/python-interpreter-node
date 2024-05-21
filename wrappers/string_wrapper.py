@@ -1,8 +1,10 @@
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from .wrapper_interface import Wrapper
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from ..wrapper_interface import Wrapper
 from collections import UserString
+
 
 class StringWrapper(UserString, Wrapper):
     def __init__(self, value):

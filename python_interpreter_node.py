@@ -4,10 +4,10 @@ from contextlib import redirect_stdout, redirect_stderr
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from .string_wrapper import StringWrapper
-from .number_wrapper import NumberWrapper
-from .image_tensor_wrapper import TensorWrapper
-from .stream_wrapper import StandardStreamWrapper
+from .wrappers.string_wrapper import StringWrapper
+from .wrappers.number_wrapper import NumberWrapper
+from .wrappers.image_tensor_wrapper import TensorWrapper
+from .streams.stream_manager import StandardStreamManager
 
 class PythonInterpreter:
     CODE_PLACEHOLDER = "\n".join(
@@ -15,6 +15,9 @@ class PythonInterpreter:
             "# For any of the variables, you must use .to() to change the value",
             "# E.g., image1.to(torch.rand(3, 3))",
             "#       number1.to(3.14)",
+            "",
+            "print(image1, image2, mask1, mask2, number1, number2)",
+            "print(text1, text2, dict1, dict2, list1, list2)",
         ]
     )
 
@@ -143,7 +146,7 @@ class PythonInterpreter:
             "text1": self.text1,
             "text2": self.text2,
         }
-        self.out_streams = StandardStreamWrapper(verbose)
+        self.out_streams = StandardStreamManager(verbose)
         self.__exec_code(code)
         result = (
             self.image1.resolve(),
@@ -164,8 +167,8 @@ class PythonInterpreter:
         # Look at the optimization: https://github.com/python/cpython/blob/3.12/Lib/timeit.py
         compiled_code = compile(code_raw_text, "<string>", "exec")
         try:
-            with redirect_stdout(self.out_streams.get_out_io()), redirect_stderr(
-                self.out_streams.get_err_io()
+            with redirect_stdout(self.out_streams.get_out()), redirect_stderr(
+                self.out_streams.get_err()
             ):
                 exec(
                     compiled_code,

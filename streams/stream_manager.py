@@ -3,7 +3,7 @@ from collections import deque
 import traceback
 
 
-class StandardStreamWrapper:
+class StandardStreamManager:
     def __init__(self, verbose: bool):
         self.full_traceback = verbose
         self.also_print_system = verbose
@@ -19,10 +19,10 @@ class StandardStreamWrapper:
             "NameError": "Check that the variable names used in your code match the input variables and that you included all necessary imports. Don't try to change the names of the input variables from how they appear in the UI.",
         }
 
-    def get_err_io(self) -> StringIO:
+    def get_err(self) -> StringIO:
         return self.err_io
 
-    def get_out_io(self) -> StringIO:
+    def get_out(self) -> StringIO:
         return self.out_io
 
     def write_err(self, err: Exception) -> None:
