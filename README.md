@@ -13,7 +13,7 @@
 ![alt text](wiki/pictures/demos/example1-caption_composite.png)
 
 
-### Description
+## Description
 
 - Allows you to write Python code in the textarea of the node which executes when the workflow is queued
 - The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 

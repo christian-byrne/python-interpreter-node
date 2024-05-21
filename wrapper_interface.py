@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import Any, Union
-import torch
+from typing import Any, Union, Generic, TypeVar
+
+T = TypeVar("T")
 
 
-class Wrapper(ABC):
+class Wrapper(ABC, Generic[T]):
     @abstractmethod
-    def to(self, tensor) -> None:
+    def to(self, new_data: Union[T, Any]) -> None:
         pass
 
     @abstractmethod
-    def resolve(self) -> Union[torch.Tensor, Any]:
+    def resolve(self) -> T:
         pass

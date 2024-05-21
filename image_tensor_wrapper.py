@@ -24,6 +24,9 @@ class TensorWrapper(Wrapper):
             self.data = tensor
         elif isinstance(tensor, Wrapper):
             self.data = tensor.resolve()
+        # TODO: If, for whatever reason, user re-assigns a variable pointing at a tensor wrapper
+        #       to something like an int or another obj, we should try to create the associated wrapper
+        #       if the type has one. If it's not a tensor and not primitive, raise an error.
 
     def convert_to_tensor(
         self, tensor: Union[torch.Tensor, numpy.ndarray, Image.Image, Any]
