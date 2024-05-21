@@ -8,7 +8,10 @@ from collections import UserList
 
 class ListWrapper(UserList, Wrapper):
     def __init__(self, value):
-        self.data = list(value)
+        if value is None:
+            self.data = []
+        else:
+            self.data = list(value)
 
     def to(self, new_value):
         self.data = list(new_value)

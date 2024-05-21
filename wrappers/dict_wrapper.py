@@ -8,7 +8,10 @@ from collections import UserDict
 
 class DictWrapper(UserDict, Wrapper):
     def __init__(self, value):
-        self.data = dict(value)
+        if value is None:
+            self.data = {}
+        else:
+            self.data = dict(value)
 
     def to(self, new_value):
         self.data = dict(new_value)

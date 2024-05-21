@@ -47,11 +47,11 @@ class TensorWrapper(Wrapper):
         return self.__class__(self.data.clone().detach())
 
     def __repr__(self):
-        return f"ImageTensorWrapper(tensor: {self.data}, shape: {self.shape}, dim: {self.dim}, dtype: {self.data.dtype}, device: {self.data.device})"
+        return f"ImageTensorWrapper({self.data})"
 
     def __str__(self):
         if self.data is not None:
-            return f"ImageTensorWrapper(tensor.shape: {self.shape}, dim: {self.dim}, dtype: {self.data.dtype}, device: {self.data.device})"
+            return f"ImageTensorWrapper(tensor.shape: {self.data.shape}, dim: {self.data.dim()}, dtype: {self.data.dtype}, device: {self.data.device})"
         return "NoneType"
 
     # The following apply to the tensor unless the wrapper has the attribute/key.
