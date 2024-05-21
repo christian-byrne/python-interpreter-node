@@ -39,4 +39,7 @@
 
 ## Non-Urgent TODO
 
-- Refactor file structure
+- [x] Refactor file structure
+- [ ] Add some `ANY` inputs/outputs (type `ANY`, names `any1`, `any2`). Add some common custom types and wrappers for them
+- [ ] Add generalized/generic wrapper
+- [ ] Add wrappers/inputs for the other builtin types like `LATENT`
