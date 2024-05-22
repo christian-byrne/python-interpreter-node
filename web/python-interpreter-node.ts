@@ -40,7 +40,6 @@ const PythonInterpreterNode: ComfyExtension = {
   setup: async (app: ComfyApp) => {},
   getCustomWidgets: async (app: ComfyApp) => {
     return {
-      STRING: ComfyWidgets["STRING"],
     };
   },
   loadedGraphNode: async (node: LGraphNodeExtension, app: ComfyApp) => {},
@@ -58,7 +57,7 @@ const PythonInterpreterNode: ComfyExtension = {
     if (nodeData?.name == "Exec Python Code Script") {
       const prototype = nodeType.prototype;
 
-      prototype.onNodeCreated = async function () {
+      prototype.onNodeCreated = function () {
         // Create the ace editor container
         const acePythonContainer = Object.assign(
           document.createElement("div"),
@@ -76,6 +75,7 @@ const PythonInterpreterNode: ComfyExtension = {
         if (this.addDOMWidget !== undefined) {
           this.addDOMWidget("python_code", "customtext", acePythonContainer, {
             getValue: function () {
+              // if (!ace?.edit) return PLACEHOLDER_CODE;
               return ace.edit("python_code").getValue();
             },
           });
@@ -83,9 +83,9 @@ const PythonInterpreterNode: ComfyExtension = {
 
         // Initialize the ace editor instance asynchronously
         try {
-          if (ace) {
+          if (ace?.edit) {
             let editor = ace.edit("python_code");
-            await editor.setOptions({
+             editor.setOptions({
               tabSize: 2,
               useSoftTabs: true,
               wrap: true,
@@ -115,7 +115,10 @@ const PythonInterpreterNode: ComfyExtension = {
             if (curIndex === -1) {
               return;
             }
-            if (widgets[curIndex].name === "raw_code") {
+            if (
+              widgets[curIndex].name === "raw_code" ||
+              widgets[curIndex].name === "output_text"
+            ) {
               widgets[curIndex].onRemove?.();
             } else {
               keepNodesCount++;
@@ -128,19 +131,19 @@ const PythonInterpreterNode: ComfyExtension = {
           this.widgets.length = keepNodesCount;
 
           // If ENTER, append a new version of the raw_code widget with the updated ace editor content
-          if (e.key !== "Enter") {
-            return;
-          }
+          // if (e.key !== "Enter") {
+          //   return;
+          // }
           const outputWidget = ComfyWidgets["STRING"](
             this,
             "raw_code",
             ["STRING", { multiline: true }],
             app
           ).widget;
-          outputWidget.value = ace.edit("python_code").getValue();
-          // outputWidget.onResize?.(0);
-          // console.log(outputWidget);
-          console.log(this.widgets);
+          if (ace) {
+            outputWidget.value = ace.edit("python_code").getValue();
+          }
+
           requestAnimationFrame(() => {
             const size_ = x.computeSize();
             console.log(size_);
@@ -153,7 +156,7 @@ const PythonInterpreterNode: ComfyExtension = {
             x.onResize?.(size_);
             app.graph.setDirtyCanvas(true, false);
           });
-          // x.onResize?.(2);
+          x.onResize?.([100, 500]);
         });
       };
 
@@ -165,7 +168,7 @@ const PythonInterpreterNode: ComfyExtension = {
 
         // Remove existing stderror/stdout widget if it exists
         const insertIndex = this.widgets.findIndex(
-          (w) => w.name === "output_text"
+          (w) => w.name === "raw_code"
         );
         if (insertIndex !== -1) {
           for (let i = insertIndex; i < this.widgets.length; i++) {
@@ -182,7 +185,6 @@ const PythonInterpreterNode: ComfyExtension = {
           app
         ).widget;
         outputWidget.value = data.text.join("");
-        outputWidget.element.style.height = "3px";
 
         requestAnimationFrame(() => {
           const size_ = this.computeSize();
