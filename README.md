@@ -1,17 +1,8 @@
 # Python Interpreter ComfyUI Node
 
-**Code -> Stdout/Err**
+![alt text](wiki/pictures/demos/new-example-caption-draw.png)
 
-![alt text](wiki/pictures/demos/example1-in_out.png)
-
-**Reassigning/Modifying Inputs and getting from Outputs**
-
-![alt text](wiki/pictures/demos/example1-with_images.png)
-
-**Complex Example - Writing a Text Caption Function**
-
-![alt text](wiki/pictures/demos/example1-caption_composite.png)
-
+![alt text](wiki/pictures/demos/new-example-complementary-colors.png)
 
 ## Description
 
@@ -25,7 +16,8 @@ Features Implemented so Far:
 - [x] Input value modification and output (5/17)
 - [x] Stdout/err display (5/19)
 - [x] Output value assignment/pipe (5/19)
-- [ ] Code editor plugin
+- [x] Code editor plugin (5/22)
+  - On code-editor-dev branch. Need to test more before merging. 
 - [ ] Dynamic inputs/outputs
 - [ ] Testing and Docs
 
