@@ -20,7 +20,6 @@ class PythonInterpreter:
             "required": {
                 "raw_code": ("STRING",{
                     "default": "",
-                    "multiline": True,
                 }),
             },
             "optional": {

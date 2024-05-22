@@ -48,7 +48,6 @@ class NumberWrapper(Wrapper):
             return int(num_str), "int"
         except ValueError:
             pass
-
         try:
             complex(num_str)
             return complex(num_str), "complex"
@@ -57,7 +56,7 @@ class NumberWrapper(Wrapper):
 
         # If none of the above conversions work, it's not a valid number
         # TODO: convert to StringWrapper or TensorWrapper if trying to change reference to be a string or tensor
-        return "not a valid number"
+        return 0, "not a valid number"
 
     def to(self, new_value):
         self.set_value(new_value)
