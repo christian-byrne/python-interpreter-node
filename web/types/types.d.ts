@@ -8,6 +8,7 @@ export interface ComfyApp {
   queueItems?: { number: number; batchCount: number }[];
   processingQueue?: boolean;
   ui: ComfyUI;
+	canvasEl: HTMLCanvasElement;
   extensions: ComfyExtension[];
   nodeOutputs: Record<string, unknown>;
   nodePreviewImages: Record<string, Image>;
@@ -33,6 +34,7 @@ export declare class LGraphNodeExtension extends LGraphNode {
     value?: string;
     string?: string;
   }) => void;
+	onExecutionStart?: () => void;
 
   nodeData?: NodeData;
   category?: str;

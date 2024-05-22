@@ -25,7 +25,7 @@ Features Implemented so Far:
 - [x] Input value modification and output (5/17)
 - [x] Stdout/err display (5/19)
 - [x] Output value assignment/pipe (5/19)
-- [ ] Code editor plugin
+- [x] Code editor plugin (5/21)
 - [ ] Dynamic inputs/outputs
 - [ ] Testing and Docs
 

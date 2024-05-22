@@ -23,6 +23,10 @@ class NumberWrapper(Wrapper):
             self.data = complex(value)
         elif isinstance(value, str):
             self.data, self.__type = self.set_number_type_from_str(value)
+        elif value is None:
+            self.data = 0
+        else:
+            self.data = value
 
         if "real" in dir(self.data):
             self.real = self.data.real
