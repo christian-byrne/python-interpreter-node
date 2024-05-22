@@ -39,9 +39,8 @@ print(image1, image2, mask1, mask2, number1, number2, sep='\\n')
 print(text1, text2, dict1, dict2, list1, list2, sep='\\n')
 
 `;
-// const PI_PLACEHOLDER_CODE = "print('Hello, world!')";
 
-const PythonInterpreterNode: ComfyExtension = {
+const PythonInterpreterExtension: ComfyExtension = {
   name: PI_LG_NAME,
   init: async (app: ComfyApp) => {
     document.head.append(
@@ -72,7 +71,7 @@ const PythonInterpreterNode: ComfyExtension = {
 
       constructorPrototype.onNodeCreated = function () {
         const node: LGraphNodeExtension = this;
-        console.debug("Node created:", node);
+        console.debug("[onNodeCreated Handler] Node created:", node);
         if (node.title !== PI_NODE_TITLE) {
           return;
         }
@@ -214,19 +213,21 @@ const PythonInterpreterNode: ComfyExtension = {
       constructorPrototype.onExecuted = function (data) {
         // TODO: Add type for data
         const node: LGraphNodeExtension = this;
-        console.debug("Node executed:", node);
+        console.debug("[onExecuted handler] Node executed:", node);
         if (!node.widgets) {
           console.debug("No widgets found on node, skipping...");
           return;
         }
 
         const insertIndex = node.widgets.findIndex(
-          (w) => w.name === "raw_code"
+          (w) => w.name === STDOUT_ERR_ID
         );
-        console.debug("Insert index for stdout/err widget:", insertIndex);
+        console.debug(
+          `Insert index for ${STDOUT_ERR_ID} widget: ${insertIndex}`
+        );
         if (insertIndex !== -1) {
           console.debug(
-            "Removing existing stdout/err widgets after insert index"
+            `Removing existing ${STDOUT_ERR_ID} widgets after insert index`
           );
           for (let i = insertIndex; i < node.widgets.length; i++) {
             node.widgets[i].onRemove?.();
@@ -234,16 +235,16 @@ const PythonInterpreterNode: ComfyExtension = {
           node.widgets.length = insertIndex;
         } else {
           console.debug(
-            "No existing stdout/err widgets found. Nothing to remove..."
+            `No existing ${STDOUT_ERR_ID} widgets found. Nothing to remove...`
           );
         }
 
         console.debug(
-          "Constructing new output_text widget with stdout/err data"
+          `Constructing new output_text widget with ${STDOUT_ERR_ID} data`
         );
         const outputWidget: ComfyWidget = ComfyWidgets["STRING"](
           node,
-          "output_text",
+          STDOUT_ERR_ID,
           ["STRING", { multiline: true }],
           app
         ).widget;
@@ -254,4 +255,4 @@ const PythonInterpreterNode: ComfyExtension = {
   },
 };
 
-app.registerExtension(PythonInterpreterNode);
+app.registerExtension(PythonInterpreterExtension);
