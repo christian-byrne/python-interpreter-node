@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "ES6",
+    "lib": ["es6", "dom", "es2016"],
     "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,

@@ -4,10 +4,23 @@ import {
   ComfyExtension,
   ComfyObjectInfo,
 } from "@comfy-main-web/types/comfy.js";
-import { ComfyApp, NodeType, LGraphNodeExtension } from "./types/types.js";
+import {
+  ComfyApp,
+  NodeType,
+  LGraphNodeExtension,
+  ComfyWidget,
+  ComfyWidgetUIWrapper,
+} from "./types/types.js";
+import { LGraph } from "@comfy-main-web/types/litegraph.js";
 declare var ace: any;
 
-const PLACEHOLDER_CODE = `"""Docs: https://github.com/christian-byrne/python-interpreter-node"""
+const PI_NODE_TITLE = "Python Interpreter";
+const PI_NODE_BACKEND_NAME = "Exec Python Code Script";
+const PI_LG_NAME = "Python Interpreter Node";
+const CODE_EDITOR_ID = "python_code";
+const HIDDEN_INPUT_ID = "raw_code";
+const STDOUT_ERR_ID = "output_text";
+const PI_PLACEHOLDER_CODE = `"""Docs: https://github.com/christian-byrne/python-interpreter-node"""
 
 # Use .to() to re-assign the value of input/output variables
 list1.to([1, 2, 3]) # Instead of list1 = [1, 2, 3]
@@ -25,11 +38,11 @@ image1.to(image1.permute(1, 2, 0).unsqueeze(0)) # Back to BHWC
 print(image1, image2, mask1, mask2, number1, number2, sep='\\n')
 print(text1, text2, dict1, dict2, list1, list2, sep='\\n')
 
-
 `;
+// const PI_PLACEHOLDER_CODE = "print('Hello, world!')";
 
 const PythonInterpreterNode: ComfyExtension = {
-  name: "PythonInterpreter",
+  name: PI_LG_NAME,
   init: async (app: ComfyApp) => {
     document.head.append(
       Object.assign(document.createElement("script"), {
@@ -39,8 +52,7 @@ const PythonInterpreterNode: ComfyExtension = {
   },
   setup: async (app: ComfyApp) => {},
   getCustomWidgets: async (app: ComfyApp) => {
-    return {
-    };
+    return {};
   },
   loadedGraphNode: async (node: LGraphNodeExtension, app: ComfyApp) => {},
   nodeCreated: async (node: LGraphNodeExtension, app: ComfyApp) => {},
@@ -54,38 +66,46 @@ const PythonInterpreterNode: ComfyExtension = {
     nodeData: ComfyObjectInfo,
     app: ComfyApp
   ) => {
-    if (nodeData?.name == "Exec Python Code Script") {
-      const prototype = nodeType.prototype;
+    if (nodeData?.name == PI_NODE_BACKEND_NAME) {
+      const constructorPrototype = nodeType.prototype; // See: https://www.typescriptlang.org/play/?#code/FDDGBsEMGdoAgDIHEBOkAOALAcgewCYCmcA3nMHJXAPTVwAiuh0AdgOQAucmkAbsbhYBRAB6FQAVw6F8cABSQWs3B0yEUcALaFVBaAEo4AIwCecIgDNIE8B2ABfEBYktQHAJaDjhC7hSEAJUIAc3doaRQ8InofORYCQgAVE3RCAC44DhTCXAtEVAwcBMMSCipaOAADLNTc-LQsKMJKuH8LdXgOXEy1esKmuFBBcJQJNz8AOjhEni5QRW84fhR3C3cZb3mJaEIyyhZCAHc4eKJk1Ll9AG4aOjkARkMTXAlBhe3iA+Ovdy4uwf8kGkcAW7hY4UUoF2VEGw1w4EIE3AuGCcgAhGjTklshN0CgVCpsoYKnIAEyGX7cGAguB4gk1Yh01IoLJ7cgwipY86IuldBlwMI9Rn4vnZOB1VTEZANIpEWHgjijcYoNkIubDRVjLooAAKIsJqTgAF44AB5IwAK3EHAmwR0evp2VNFjiCW5+jZQ3B8MRyNRXpGWr8DtFqQ9MIDPqRKLkAc1ypDBuIYIhrhyeQAYi43J4WOGqJ64Qjo6jzVa3BMwqJpOD3EYEbGNUrtYmGfpiXQAMJNoMaXlJt4sRaEEQ1oiyQ6-TAnI60-HoaBstkVGbC3ALkH+ODQHj+WSQUD42Ag8DgAUKyHMAGEIEbUw9IHy8K91U6VrG+SGI0APlIkeLfpyAARCO4hSDIQH6I4MJcji-YMhMgiiGB0iyCaKA3CuADKcCTqePT4sc6j4hoLgIseI5jn0jQJCAMJqjOhwAJIXmmH5fNRsqEJcVxsl8LGplCiHCGIkioZcDggMARg+H4gQhGEERNDELrSv0xTAEAA
+      const liteGraph: LGraph = app.graph;
 
-      prototype.onNodeCreated = function () {
-        // Create the ace editor container
+      constructorPrototype.onNodeCreated = function () {
+        const node: LGraphNodeExtension = this;
+        console.debug("Node created:", node);
+        if (node.title !== PI_NODE_TITLE) {
+          return;
+        }
+
         const acePythonContainer = Object.assign(
           document.createElement("div"),
           {
-            id: "python_code",
-            textContent: PLACEHOLDER_CODE,
+            id: CODE_EDITOR_ID,
+            textContent: PI_PLACEHOLDER_CODE,
             style: {
               width: "300px",
-              height: "300px",
+              height: "500px",
             },
           }
         );
 
-        // Add the ace editor container to the node
-        if (this.addDOMWidget !== undefined) {
-          this.addDOMWidget("python_code", "customtext", acePythonContainer, {
+        // Add ace editor container to the node on creation
+        if (node.addDOMWidget !== undefined) {
+          node.addDOMWidget(CODE_EDITOR_ID, "customtext", acePythonContainer, {
+            // Is this necessary?
             getValue: function () {
-              // if (!ace?.edit) return PLACEHOLDER_CODE;
-              return ace.edit("python_code").getValue();
+              return ace.edit(CODE_EDITOR_ID).getValue();
             },
           });
         }
 
-        // Initialize the ace editor instance asynchronously
+        // TODO: use faster way to load
+        // Initialize the ace editor object instance (TODO: asynchronously)
         try {
           if (ace?.edit) {
-            let editor = ace.edit("python_code");
-             editor.setOptions({
+            console.debug("Initializing ace editor for python code node");
+            let editor = ace.edit(CODE_EDITOR_ID);
+            editor.setOptions({
               tabSize: 2,
               useSoftTabs: true,
               wrap: true,
@@ -99,104 +119,136 @@ const PythonInterpreterNode: ComfyExtension = {
             });
           }
         } catch (e) {
+          // TODO: handle error
           console.error(
             "Error trying to initialize ace editor for python code node",
             e
           );
         }
 
-        const x = this;
-
-        // Add a listener to the canvas element to update the hidden input widget with the ace editor content on keydown
+        console.debug(
+          "Adding keydown listener to canvas element to update hidden input widget with ace editor code"
+        );
         app.canvasEl.addEventListener("keydown", (e) => {
-          // Remove any displayed raw_code widgets
-          let keepNodesCount = 1;
-          const recursiveRemoveWidgets = (widgets, curIndex) => {
-            if (curIndex === -1) {
+          const keepWidgets: ComfyWidget[] = [];
+          const removeWidgets: ComfyWidget[] = [];
+          const initialWidgetsLength = node.widgets.length;
+
+          const recursiveWidgetFilter = (
+            widgets: ComfyWidget[],
+            curIndex: number
+          ) => {
+            if (curIndex === widgets.length) {
               return;
             }
+            const widget: ComfyWidget = widgets[curIndex];
             if (
-              widgets[curIndex].name === "raw_code" ||
-              widgets[curIndex].name === "output_text"
+              widget.name === HIDDEN_INPUT_ID ||
+              widget.name === STDOUT_ERR_ID
             ) {
-              widgets[curIndex].onRemove?.();
+              removeWidgets.push(widget);
             } else {
-              keepNodesCount++;
+              keepWidgets.push(widget);
             }
-            curIndex--;
-            recursiveRemoveWidgets(widgets, curIndex);
+            recursiveWidgetFilter(widgets, curIndex + 1);
           };
+          recursiveWidgetFilter(node.widgets, 0);
+          console.debug(
+            `Went from ${initialWidgetsLength} to ${keepWidgets.length} widgets`
+          );
+          console.debug(
+            "Keeping widgets:",
+            keepWidgets,
+            "Removing widgets:",
+            removeWidgets
+          );
+          node.widgets = keepWidgets;
+          liteGraph.setDirtyCanvas(true, true);
+          console.debug("After removal, node.widgets:", node.widgets);
 
-          recursiveRemoveWidgets(this.widgets, this.widgets.length - 1);
-          this.widgets.length = keepNodesCount;
-
-          // If ENTER, append a new version of the raw_code widget with the updated ace editor content
-          // if (e.key !== "Enter") {
-          //   return;
-          // }
-          const outputWidget = ComfyWidgets["STRING"](
-            this,
-            "raw_code",
-            ["STRING", { multiline: true }],
-            app
-          ).widget;
-          if (ace) {
-            outputWidget.value = ace.edit("python_code").getValue();
+          console.debug(
+            "Triggering `onRemove` of widget in removeWidgets array"
+          );
+          for (let i = 0; i < removeWidgets.length; i++) {
+            removeWidgets[i].onRemove?.();
+            liteGraph.setDirtyCanvas(true, true);
           }
 
-          requestAnimationFrame(() => {
-            const size_ = x.computeSize();
-            console.log(size_);
-            if (size_[0] < x.size[0]) {
-              size_[0] = x.size[0];
+          // TODO: Be selective about the event types being targeted
+          console.debug(`Creating new ${HIDDEN_INPUT_ID} widget`);
+          const widgetWrapper: ComfyWidgetUIWrapper = ComfyWidgets["STRING"](
+            node,
+            HIDDEN_INPUT_ID,
+            ["STRING", { multiline: true }],
+            app
+          );
+          const outputWidget: ComfyWidget = widgetWrapper.widget;
+          try {
+            console.debug(
+              `Setting hidden ${HIDDEN_INPUT_ID} widget's style to hidden`
+            );
+            outputWidget.element.style.display = "none";
+            outputWidget.element.style.visibility = "hidden";
+            outputWidget.element.style.opacity = "0";
+            liteGraph.setDirtyCanvas(true, true);
+          } catch (e) {
+            console.error(
+              `Error trying to set ${HIDDEN_INPUT_ID} widget's stlye (hiding)`,
+              e
+            );
+          }
+
+          try {
+            console.debug("Setting output widget's value to ace editor value");
+            // if (Object.getOwnPropertyNames(window).includes("ace")) {
+            if (ace?.edit) {
+              outputWidget.value = ace.edit("python_code").getValue();
             }
-            if (size_[1] < x.size[1]) {
-              size_[1] = x.size[1];
-            }
-            x.onResize?.(size_);
-            app.graph.setDirtyCanvas(true, false);
-          });
-          x.onResize?.([100, 500]);
+          } catch (e) {
+            console.error("Error trying to get ace editor value", e);
+          }
         });
       };
 
       // After execution, add a new widget to display the stdout/stderr
-      prototype.onExecuted = function (data) {
-        if (!this.widgets) {
+      constructorPrototype.onExecuted = function (data) {
+        // TODO: Add type for data
+        const node: LGraphNodeExtension = this;
+        console.debug("Node executed:", node);
+        if (!node.widgets) {
+          console.debug("No widgets found on node, skipping...");
           return;
         }
 
-        // Remove existing stderror/stdout widget if it exists
-        const insertIndex = this.widgets.findIndex(
+        const insertIndex = node.widgets.findIndex(
           (w) => w.name === "raw_code"
         );
+        console.debug("Insert index for stdout/err widget:", insertIndex);
         if (insertIndex !== -1) {
-          for (let i = insertIndex; i < this.widgets.length; i++) {
-            this.widgets[i].onRemove?.();
+          console.debug(
+            "Removing existing stdout/err widgets after insert index"
+          );
+          for (let i = insertIndex; i < node.widgets.length; i++) {
+            node.widgets[i].onRemove?.();
           }
-          this.widgets.length = insertIndex;
+          node.widgets.length = insertIndex;
+        } else {
+          console.debug(
+            "No existing stdout/err widgets found. Nothing to remove..."
+          );
         }
 
-        // Construct new widget with the output text and set value to stdout/stderr
-        const outputWidget = ComfyWidgets["STRING"](
-          this,
+        console.debug(
+          "Constructing new output_text widget with stdout/err data"
+        );
+        const outputWidget: ComfyWidget = ComfyWidgets["STRING"](
+          node,
           "output_text",
           ["STRING", { multiline: true }],
           app
         ).widget;
         outputWidget.value = data.text.join("");
-
-        requestAnimationFrame(() => {
-          const size_ = this.computeSize();
-          if (size_[0] < this.size[0]) {
-            size_[0] = this.size[0];
-          }
-          if (size_[1] < this.size[1]) {
-            size_[1] = this.size[1];
-          }
-          this.onResize?.(size_);
-          app.graph.setDirtyCanvas(true, false);
-        });
+        liteGraph.setDirtyCanvas(true, true);
       };
     }
   },

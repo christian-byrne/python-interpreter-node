@@ -1,4 +1,11 @@
-import { LGraphNode, IWidget } from "@comfy-main-web/types/litegraph.js";
+import { LGraph, LGraphNode, IWidget } from "@comfy-main-web/types/litegraph.js";
+import { ComfyUI } from "../web/scripts/ui";
+
+export interface ComfyWidgetUIWrapper {
+  widget: ComfyWidget;
+  minHeight?: number;
+  minWidth?: number;
+}
 
 // --------------------------------------------------------------
 // From comfy_mtb:
@@ -8,7 +15,7 @@ export interface ComfyApp {
   queueItems?: { number: number; batchCount: number }[];
   processingQueue?: boolean;
   ui: ComfyUI;
-	canvasEl: HTMLCanvasElement;
+  canvasEl: HTMLCanvasElement;
   extensions: ComfyExtension[];
   nodeOutputs: Record<string, unknown>;
   nodePreviewImages: Record<string, Image>;
@@ -34,7 +41,7 @@ export declare class LGraphNodeExtension extends LGraphNode {
     value?: string;
     string?: string;
   }) => void;
-	onExecutionStart?: () => void;
+  onExecutionStart?: () => void;
 
   nodeData?: NodeData;
   category?: str;
