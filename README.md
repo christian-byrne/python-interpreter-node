@@ -1,74 +1,22 @@
-# Python Interpreter ComfyUI Node
-
-![alt text](wiki/pictures/demos/new-example-caption-draw.png)
-
-![alt text](wiki/pictures/demos/new-example-complementary-colors.png)
-
-## Description
-
-- Allows you to write Python code in the textarea of the node which executes when the workflow is queued
-- The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
-- The input values can be accessed by their UI name. 
-- The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.
-
-Features Implemented so Far:
-- [x] Code execution (5/16)
-- [x] Input value modification and output (5/17)
-- [x] Stdout/err display (5/19)
-- [x] Output value assignment/pipe (5/19)
-- [x] Code editor plugin (5/22)
-  - On code-editor-dev branch. Need to test more before merging. 
-- [ ] Dynamic inputs/outputs
-- [ ] Testing and Docs
-
-## Reason to Use
-
-- Anything that can be done with Python code
-- Embedding little scripts into your saved workflows
-- Quickly make a node that can do a specialized task
-- Converting types
-- Doing math with input values
-- Debugging
-- Testing custom nodes faster.
-- Even if you can't code, you can ask ChatGPT to write a python snippet for you to accomplish a tedious task
+# TODO
 
 
-## Usage
+- CREATE SINGULAR FACTORY FUNCTION THAT ITERATES OVER ALL POSSIBLE TYPES. THEN IN EACH WRAPPERS `__new__` METHOD, THAT FACTORY FUNCTION WILL BE CALLED TO GET THE RIGHT TYPE OF WRAPPER. THIS WILL ALLOW FOR EASY ADDITION OF NEW WRAPPERS AND WILL MAKE THE CODE MORE READABLE.
+- Test the refactoring of the wrapper abc file and filename
+- The current `__init__` methods should be changed so their logic is moved to their `__new__` methods and so that if the type passed is wrong, it instead creates an instance of a different wrapper then returns that in the init call. Requires testing that the right type of instance is returned and that all expected behaviour is captured by the delegation. Example:
+  ```python
+  def __new__(cls, value):
+      if isinstance(value, cls._type):
+          return super().__new__(cls)
+      elif isinstance(value, torch.Tensor):
+          return TensorWrapper(value)
+      elif isinstance(value, np.ndarray):
+          return NumpyWrapper(value)
+      else:
+          raise TypeError(f"Cannot create {cls.__name__} from {type(value).__name__}")
 
-- The variables in the UI (e.g., `image1`, `number1`, `text1`, etc.) can be accessed directly in the code by the same name
-    ```python
-    print(image1.shape)
-    print(number1 * random.randint(0, 99))
-    ```
-- The output values share the same names as the input values. Changes you make to these variables will be reflected in the output values.
-- The code will work as expected in almost all cases except for i. re-assignment and ii. passing the variables as arguments to functions.
-  1.  To re-assign a variable, you must use its `to()` method, regardless of the variable's type
-      ```python
-      # Instead of number1 = float(number1):
-      number1.to(float(number1))
+  def __init__(self, value):
+      self._value = value
+  ```
 
-      # Instead of image1 = 0.5 * (image1 + image2):
-      image1.to(0.5 * (image1 + image2))
-
-      # Instead of mask1 = 1 - mask1:
-      mask1.to(1 - mask1)
-
-      # Instead of text1 = text1.replace("bad", ""):
-      text1.to(text1.replace("bad", ""))
-
-      # In-place operators (+=, ++, /=, etc.) will work normally
-      number1++
-      text1 += " is good"
-      ```
-  2. To pass the variables as arguments to functions, just pass the `.data` attribute of the variable instead (regardless of the variable's type)
-      ```python
-      # Instead of pil_img = ToPILImage()(image1):
-      pil_img = ToPILImage()(image1.data)
-
-      # Instead of random.sample[number1, number2]:
-      random.sample([number1.data, number2.data])
-
-      # Not necessary for built-in functions
-      print(image1) # works
-      print(len(text1)) # works
-      ```
+  

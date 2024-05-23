@@ -1,86 +1,58 @@
 import sys
 import os
-import torch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from .wrapper_abc import Wrapper
-from .list_wrapper import ListWrapper
-from .dict_wrapper import DictWrapper
-from .image_tensor_wrapper import TensorWrapper
+from ..wrapper_abc import Wrapper
 
-from typing import Any, Union
+from typing import Union, Any
 
 
-class NumberWrapper(Wrapper):
-    def __init__(self, value):
-        while isinstance(value, Wrapper):
-            value = value.resolve()
-        self.set_value(value)
+class AbstractExternalWrapper(Wrapper):
+    def __init__(self, value: Any):
+        self.data = value
 
-    def set_value(
-        self, value: Union[int, float, complex, str, list, dict, torch.Tensor]
-    ) -> None:
-        # TODO: from hex, from oct, from bin
-        self.__type = type(value)
-        if isinstance(value, list):
-            self.data = ListWrapper(value)
-            self.__type = "list"
-        elif isinstance(value, (dict, str, bytes, bytearray)):
-            self.data = DictWrapper(value)
-            self.__type = "dict"
-        elif isinstance(value, torch.Tensor):
-            self.data = TensorWrapper(value)
-            self.__type = "tensor"
-        elif isinstance(value, int):
-            self.data = int(value)
-        elif isinstance(value, float):
-            self.data = float(value)
-        elif isinstance(value, complex):
-            self.data = complex(value)
-        elif isinstance(value, str):
-            self.data, self.__type = self.set_number_type_from_str(value)
+    def to(self, new_value: Union[Any, Wrapper]) -> Wrapper:
+        while isinstance(new_value, Wrapper):
+            new_value = new_value.resolve()
 
-        if "real" in dir(self.data):
-            self.real = self.data.real
-        if "imag" in dir(self.data):
-            self.imag = self.data.imag
-        if "numerator" in dir(self.data):
-            self.numerator = self.data.numerator
-        if "denominator" in dir(self.data):
-            self.denominator = self.data.denominator
-
-    def set_number_type_from_str(self, num_str: str) -> Union[int, float, complex, str]:
-        try:
-            float(num_str)
-            return float(num_str), "float"
-        except ValueError:
-            pass
-        try:
-            int(num_str)
-            return int(num_str), "int"
-        except ValueError:
-            pass
-
-        try:
-            complex(num_str)
-            return complex(num_str), "complex"
-        except ValueError:
-            pass
-
-        # If none of the above conversions work, it's not a valid number
-        # TODO: convert to StringWrapper or TensorWrapper if trying to change reference to be a string or tensor
-        return "not a valid number"
-
-    def to(
-        self, new_value: Union[int, float, complex, str, list, dict, torch.Tensor, Any]
-    ) -> Wrapper:
-        self.set_value(new_value)
+        self.data = new_value
         return self
 
-    def resolve(self) -> Union[int, float, complex]:
+    def resolve(self) -> Any:
         return self.data
 
-    # the follow overloaded inherited methods are defined in alphabetical order:
+    def __getattr__(self, attr: str) -> Any:
+        if attr == "parent_attributes":
+            return [
+                "data",
+                "to",
+                "resolve",
+                "parent_attributes",
+            ]
+        if attr in self.parent_attributes:
+            return getattr(self, attr)
+        return getattr(self.data, attr)
+
+    def __setattr__(self, attr: str, value: Any) -> None:
+        if attr in self.parent_attributes:
+            super().__setattr__(attr, value)
+        else:
+            setattr(self.data, attr, value)
+
+    def __delattr__(self, name: str) -> None:
+        if name in self.parent_attributes:
+            delattr(self, name)
+        else:
+            delattr(self.data, name)
+
+    def __str__(self) -> str:
+        return str(self.data)
+
+    def __repr__(self) -> str:
+        return repr(self.data)
+
+    # The following operations act as if they are the abstract type.
+    # Listed in alphabetical order.
 
     def __abs__(self):
         return abs(self.data)
@@ -97,22 +69,46 @@ class NumberWrapper(Wrapper):
             return self.__class__(self.data & other.data)
         return self.__class__(self.data & other)
 
+    def __array__(self):
+        return self.data.__array__()
+
+    def __array_priority__(self):
+        return self.data.__array_priority__()
+
+    def __array_wrap__(self):
+        return self.data.__array_wrap__()
+
     def __bool__(self):
         return bool(self.data)
 
-    def __ceil__(self):
-        return self.data.ceil()
+    def __complex__(self):
+        return complex(self.data)
 
-    def __delattr__(self, name):
-        return self.data.__delattr__(name)
+    def __contains__(self, item):
+        return item in self.data
+
+    def __deepcopy__(self, memo):
+        return self.data.__deepcopy__(memo)
+
+    def __delitem__(self, key):
+        del self.data[key]
+
+    def __dict__(self):
+        return self.data.__dict__()
 
     def __dir__(self):
         return dir(self.data)
 
-    def __divmod__(self, other):
+    def __div__(self, other):
         if isinstance(other, Wrapper):
-            return self.__class__(divmod(self.data, other.data))
-        return self.__class__(divmod(self.data, other))
+            return self.__class__(self.data / other.data)
+        return self.__class__(self.data / other)
+
+    def __dlpack__(self):
+        return self.data.__dlpack__()
+
+    def __dlpack_device__(self):
+        return self.data.__dlpack_device__()
 
     def __eq__(self, other):
         if isinstance(other, Wrapper):
@@ -121,9 +117,6 @@ class NumberWrapper(Wrapper):
 
     def __float__(self):
         return float(self.data)
-
-    def __floor__(self):
-        return self.data.floor()
 
     def __floordiv__(self, other):
         if isinstance(other, Wrapper):
@@ -138,8 +131,8 @@ class NumberWrapper(Wrapper):
             return self.data >= other.data
         return self.data >= other
 
-    def __getnewargs__(self):
-        return (self.data[:],)
+    def __getitem__(self, key):
+        return self.data[key]
 
     def __getstate__(self):
         return self.data.__getstate__()
@@ -152,6 +145,55 @@ class NumberWrapper(Wrapper):
     def __hash__(self):
         return hash(self.data)
 
+    def __iadd__(self, other):
+        if isinstance(other, Wrapper):
+            self.data += other.data
+        else:
+            self.data += other
+        return self
+
+    def __iand__(self, other):
+        if isinstance(other, Wrapper):
+            self.data &= other.data
+        else:
+            self.data &= other
+        return self
+
+    def __idiv__(self, other):
+        if isinstance(other, Wrapper):
+            self.data /= other.data
+        else:
+            self.data /= other
+        return self
+
+    def __ifloordiv__(self, other):
+        if isinstance(other, Wrapper):
+            self.data //= other.data
+        else:
+            self.data //= other
+        return self
+
+    def __ilshift__(self, other):
+        if isinstance(other, Wrapper):
+            self.data <<= other.data
+        else:
+            self.data <<= other
+        return self
+
+    def __imod__(self, other):
+        if isinstance(other, Wrapper):
+            self.data %= other.data
+        else:
+            self.data %= other
+        return self
+
+    def __imul__(self, other):
+        if isinstance(other, Wrapper):
+            self.data *= other.data
+        else:
+            self.data *= other
+        return self
+
     def __index__(self):
         return self.data.__index__()
 
@@ -161,10 +203,61 @@ class NumberWrapper(Wrapper):
     def __invert__(self):
         return ~self.data
 
+    def __ior__(self, other):
+        if isinstance(other, Wrapper):
+            self.data |= other.data
+        else:
+            self.data |= other
+        return self
+
+    def __ipow__(self, other):
+        if isinstance(other, Wrapper):
+            self.data **= other.data
+        else:
+            self.data **= other
+        return self
+
+    def __irshift__(self, other):
+        if isinstance(other, Wrapper):
+            self.data >>= other.data
+        else:
+            self.data >>= other
+        return self
+
+    def __isub__(self, other):
+        if isinstance(other, Wrapper):
+            self.data -= other.data
+        else:
+            self.data -= other
+        return self
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __itruediv__(self, other):
+        if isinstance(other, Wrapper):
+            self.data /= other.data
+        else:
+            self.data /= other
+        return self
+
+    def __ixor__(self, other):
+        if isinstance(other, Wrapper):
+            self.data ^= other.data
+        else:
+            self.data ^= other
+        return self
+
     def __le__(self, other):
         if isinstance(other, Wrapper):
             return self.data <= other.data
         return self.data <= other
+
+    def __len__(self):
+        return len(self.data)
+
+    def __long__(self):
+        return long(self.data)
 
     def __lshift__(self, other):
         if isinstance(other, Wrapper):
@@ -176,10 +269,18 @@ class NumberWrapper(Wrapper):
             return self.data < other.data
         return self.data < other
 
+    def __matmul__(self, other):
+        if isinstance(other, Wrapper):
+            return self.__class__(self.data @ other.data)
+        return self.__class__(self.data @ other)
+
     def __mod__(self, other):
         if isinstance(other, Wrapper):
             return self.__class__(self.data % other.data)
         return self.__class__(self.data % other)
+
+    def __module__(self):
+        return self.data.__module__()
 
     def __mul__(self, other):
         if isinstance(other, Wrapper):
@@ -193,6 +294,9 @@ class NumberWrapper(Wrapper):
 
     def __neg__(self):
         return -self.data
+
+    def __nonzero__(self):
+        return self.data.__nonzero__()
 
     def __or__(self, other):
         if isinstance(other, Wrapper):
@@ -208,8 +312,8 @@ class NumberWrapper(Wrapper):
         return self.__class__(self.data**other)
 
     def __radd__(self, other):
-        if isinstance(other, str):
-            return self.__class__(float(other) + self.data)
+        if isinstance(other, Wrapper):
+            return self.__class__(other.data + self.data)
         return self.__class__(other + self.data)
 
     def __rand__(self, other):
@@ -217,10 +321,10 @@ class NumberWrapper(Wrapper):
             return self.__class__(other.data & self.data)
         return self.__class__(other & self.data)
 
-    def __rdivmod__(self, other):
+    def __rdiv__(self, other):
         if isinstance(other, Wrapper):
-            return self.__class__(divmod(other.data, self.data))
-        return self.__class__(divmod(other, self.data))
+            return self.__class__(other.data / self.data)
+        return self.__class__(other / self.data)
 
     def __reduce__(self):
         return self.data.__reduce__()
@@ -228,8 +332,8 @@ class NumberWrapper(Wrapper):
     def __reduce_ex__(self, protocol):
         return self.data.__reduce_ex__(protocol)
 
-    def __repr__(self):
-        return repr(self.data)
+    def __reversed__(self):
+        return reversed(self.data)
 
     def __rfloordiv__(self, other):
         if isinstance(other, Wrapper):
@@ -240,6 +344,11 @@ class NumberWrapper(Wrapper):
         if isinstance(other, Wrapper):
             return self.__class__(other.data << self.data)
         return self.__class__(other << self.data)
+
+    def __rmatmul__(self, other):
+        if isinstance(other, Wrapper):
+            return self.__class__(other.data @ self.data)
+        return self.__class__(other @ self.data)
 
     def __rmod__(self, other):
         if isinstance(other, Wrapper):
@@ -255,9 +364,6 @@ class NumberWrapper(Wrapper):
         if isinstance(other, Wrapper):
             return self.__class__(other.data | self.data)
         return self.__class__(other | self.data)
-
-    def __round__(self, ndigits=None):
-        return self.data.__round__(ndigits)
 
     def __rpow__(self, other):
         if isinstance(other, Wrapper):
@@ -287,50 +393,38 @@ class NumberWrapper(Wrapper):
     def __rxor__(self, other):
         if isinstance(other, Wrapper):
             return self.__class__(other.data ^ self.data)
+
         return self.__class__(other ^ self.data)
+
+    def __setitem__(self, key, value):
+        self.data[key] = value
+
+    def __setstate__(self, state):
+        self.data.__setstate__(state)
 
     def __sizeof__(self):
         return self.data.__sizeof__()
 
-    def __str__(self):
-        return str(self.data)
-
     def __sub__(self, other):
         if isinstance(other, Wrapper):
             return self.__class__(self.data - other.data)
-        elif isinstance(other, str):
-            return self.__class__(self.data - float(other))
         return self.__class__(self.data - other)
+
+    def __torch_dispatch__(self):
+        return self.data.__torch_dispatch__()
+
+    def __torch_function__(self):
+        return self.data.__torch_function__()
 
     def __truediv__(self, other):
         if isinstance(other, Wrapper):
             return self.__class__(self.data / other.data)
         return self.__class__(self.data / other)
 
-    def __trunc__(self):
-        return self.data.__trunc__()
+    def __weakref__(self):
+        return self.data.__weakref__()
 
     def __xor__(self, other):
         if isinstance(other, Wrapper):
             return self.__class__(self.data ^ other.data)
         return self.__class__(self.data ^ other)
-
-    # the following named methods are defined in alphabetical order:
-
-    def as_integer_ratio(self):
-        return self.data.as_integer_ratio()
-
-    def bit_count(self):
-        return self.data.bit_count()
-
-    def bit_length(self):
-        return self.data.bit_length()
-
-    def conjugate(self):
-        return self.__class__(self.data.conjugate())
-
-    def from_bytes(self, bytes, byteorder, *, signed=False):
-        return self.__class__(int.from_bytes(bytes, byteorder, signed))
-
-    def to_bytes(self, length, byteorder, *, signed=False):
-        return self.data.to_bytes(length, byteorder, signed)

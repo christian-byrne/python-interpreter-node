@@ -1,0 +1,8 @@
+[tool.poetry]
+name = "python-interpreter-node"
+version = "0.1.0"
+description = "Python interpreter node for ComfyUI"
+authors = ["christian-byrne"]
+
+[tool.poetry.dependencies]
+python = "^3.10"

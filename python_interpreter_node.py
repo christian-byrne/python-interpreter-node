@@ -1,36 +1,19 @@
 import torch
-from typing import Optional, List, Union, Any
 from contextlib import redirect_stdout, redirect_stderr
 import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from .wrappers.string_wrapper import StringWrapper
-from .wrappers.number_wrapper import NumberWrapper
-from .wrappers.image_tensor_wrapper import TensorWrapper
-from .wrappers.list_wrapper import ListWrapper
-from .wrappers.dict_wrapper import DictWrapper
+from .wrappers.wrapper_abc import Wrapper
+from .wrappers.wrapper_factory import WrapperFactory
 from .streams.stream_manager import StandardStreamManager
+
+from typing import Optional, List, Union, Any, Dict
 
 
 class PythonInterpreter:
     CODE_PLACEHOLDER = "\n".join(
         [
-            "# Docs: https://github.com/christian-byrne/python-interpreter-node",
-            "",
-            "# Use .to() to re-assign the value of input/output variables",
-            "list1.to([1, 2, 3, 4])",
-            "number1.to(3.14)",
-            "",
-            "# If passing inputs/outputs as args to non-builtins, use .data",
-            "from torchvision.transforms import ToPILImage",
-            "image1.to(image1.squeeze(0).permute(2, 0, 1)) # From BHWC to CHW",
-            "image1_pil = ToPILImage()(image1.data) # Use .data when passing as arg",
-            "image1_pil.show()",
-            "image1.to(image1.permute(1, 2, 0).unsqueeze(0)) # Back to BHWC",
-            "",
-            "# In all other cases, code behaves like normal python code",
-            "# Any variables you define yourself will behave as expected",
             "print(image1, image2, mask1, mask2, number1, number2, sep='\\n')",
             "print(text1, text2, dict1, dict2, list1, list2, sep='\\n')",
         ]
@@ -40,11 +23,10 @@ class PythonInterpreter:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "python_code": (
+                "raw_code": (
                     "STRING",
                     {
-                        "default": cls.CODE_PLACEHOLDER,
-                        "multiline": True,
+                        "default": "",
                     },
                 ),
             },
@@ -139,7 +121,8 @@ class PythonInterpreter:
 
     def run(
         self,
-        python_code: str,
+        # TODO: litegraph adds input dynamically then passes as a hidden input the reference dict, for which we use to map Wrappers to keys, so that this is all done dynamically
+        raw_code: str = "",
         image1: Optional[torch.Tensor] = None,
         image2: Optional[torch.Tensor] = None,
         mask1: Optional[torch.Tensor] = None,
@@ -157,63 +140,51 @@ class PythonInterpreter:
         unique_id=None,
         extra_pnginfo=None,
     ):
-        self.image1 = TensorWrapper(image1)
-        self.image2 = TensorWrapper(image2)
-        self.mask1 = TensorWrapper(mask1)
-        self.mask2 = TensorWrapper(mask2)
-        self.number1 = NumberWrapper(number1)
-        self.number2 = NumberWrapper(number2)
-        self.text1 = StringWrapper(text1)
-        self.text2 = StringWrapper(text2)
-        self.list1 = ListWrapper(list1)
-        self.list2 = ListWrapper(list2)
-        self.dict1 = DictWrapper(dict1)
-        self.dict2 = DictWrapper(dict2)
+        self.image1 = WrapperFactory(image1)
+        self.image2 = WrapperFactory(image2)
+        self.mask1 = WrapperFactory(mask1)
+        self.mask2 = WrapperFactory(mask2)
+        self.number1 = WrapperFactory(number1)
+        self.number2 = WrapperFactory(number2)
+        self.text1 = WrapperFactory(text1)
+        self.text2 = WrapperFactory(text2)
+        self.list1 = WrapperFactory(list1)
+        self.list2 = WrapperFactory(list2)
+        self.dict1 = WrapperFactory(dict1)
+        self.dict2 = WrapperFactory(dict2)
 
-        code_lines, return_statements = self.__splice_return_statments(
-            python_code.split("\n")
+        self.shared_ref_dict = self.__map_ref_dict(
+            [
+                "image1",
+                "image2",
+                "mask1",
+                "mask2",
+                "number1",
+                "number2",
+                "text1",
+                "text2",
+                "list1",
+                "list2",
+                "dict1",
+                "dict2",
+            ]
         )
-        return_variables = [statement.split()[1] for statement in return_statements]
-        # TODO: return instances. capture additional return values and append to outputs
-
-        code = "\n".join(code_lines)
-        self.shared_ref_dict = {
-            "image1": self.image1,
-            "image2": self.image2,
-            "mask1": self.mask1,
-            "mask2": self.mask2,
-            "number1": self.number1,
-            "number2": self.number2,
-            "text1": self.text1,
-            "text2": self.text2,
-            "list1": self.list1,
-            "list2": self.list2,
-            "dict1": self.dict1,
-            "dict2": self.dict2,
-        }
         self.out_streams = StandardStreamManager(verbose)
-        self.__exec_code(code)
-        result = (
-            self.image1.resolve(),
-            self.image2.resolve(),
-            self.mask1.resolve(),
-            self.mask2.resolve(),
-            self.number1.resolve(),
-            self.number2.resolve(),
-            self.text1.resolve(),
-            self.text2.resolve(),
-            self.list1.resolve(),
-            self.list2.resolve(),
-            self.dict1.resolve(),
-            self.dict2.resolve(),
-        )
+        self.__exec_code(raw_code)
+        result = self.close_scope(self.shared_ref_dict)
         return {
             "ui": {"text": str(self.out_streams)},
             "result": result,
         }
 
+    def close_scope(self, ref_dict: Dict[str, Wrapper]) -> List[Any]:
+        ret = []
+        for value in ref_dict.values():
+            if isinstance(value, Wrapper):
+                ret.append(value.resolve())
+        return ret
+
     def __exec_code(self, code_raw_text: str):
-        # Look at the optimization: https://github.com/python/cpython/blob/3.12/Lib/timeit.py
         compiled_code = compile(code_raw_text, "<string>", "exec")
         try:
             with redirect_stdout(self.out_streams.get_out()), redirect_stderr(
@@ -226,8 +197,6 @@ class PythonInterpreter:
         except Exception as e:
             self.out_streams.write_err(e)
 
-    def __splice_return_statments(self, code_lines: List[str]):
-        """Don't remove nested returns"""
-        returns = [line for line in code_lines if line.startswith("return")]
-        non_returns = [line for line in code_lines if not line.startswith("return")]
-        return non_returns, returns
+    def __map_ref_dict(self, attributes: List[Any]) -> Dict[str, Wrapper]:
+        ref_dict = {attr: getattr(self, attr) for attr in attributes}
+        return ref_dict

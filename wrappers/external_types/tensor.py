@@ -5,7 +5,7 @@ import sys
 import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from .wrapper_abc import Wrapper
+from ..wrapper_abc import Wrapper
 
 from typing import Union, Any
 
@@ -20,14 +20,12 @@ class TensorWrapper(Wrapper):
     def resolve(self):
         return self.data
 
-    def to(self, tensor: Union[torch.Tensor, Wrapper]):
-        if isinstance(tensor, torch.Tensor):
-            self.data = tensor
-        elif isinstance(tensor, Wrapper):
-            self.data = tensor.resolve()
-        # TODO: If, for whatever reason, user re-assigns a variable pointing at a tensor wrapper
-        #       to something like an int or another obj, we should try to create the associated wrapper
-        #       if the type has one. If it's not a tensor and not primitive, raise an error.
+    def to(self, tensor: Union[torch.Tensor, Wrapper, numpy.ndarray, Image.Image, Any]):
+        while isinstance(tensor, Wrapper):
+            tensor = tensor.resolve()
+
+        self.data = self.convert_to_tensor(tensor)
+        return self
 
     def convert_to_tensor(
         self, tensor: Union[torch.Tensor, numpy.ndarray, Image.Image, Any]
@@ -290,7 +288,7 @@ class TensorWrapper(Wrapper):
         return len(self.data)
 
     def __long__(self):
-        return long(self.data)
+        return self.data.__long__()
 
     def __lshift__(self, other):
         if isinstance(other, Wrapper):
