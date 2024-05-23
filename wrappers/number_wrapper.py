@@ -1,20 +1,36 @@
 import sys
 import os
+import torch
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from ..wrapper_interface import Wrapper
+from .wrapper_abc import Wrapper
+from .list_wrapper import ListWrapper
+from .dict_wrapper import DictWrapper
+from .image_tensor_wrapper import TensorWrapper
+
+from typing import Any, Union
 
 
 class NumberWrapper(Wrapper):
     def __init__(self, value):
+        while isinstance(value, Wrapper):
+            value = value.resolve()
         self.set_value(value)
 
-    def set_value(self, value):
+    def set_value(
+        self, value: Union[int, float, complex, str, list, dict, torch.Tensor]
+    ) -> None:
         # TODO: from hex, from oct, from bin
         self.__type = type(value)
-        if isinstance(value, Wrapper):
-            # TODO: make copy is ever neccessary?
-            self.data = value.resolve()
+        if isinstance(value, list):
+            self.data = ListWrapper(value)
+            self.__type = "list"
+        elif isinstance(value, (dict, str, bytes, bytearray)):
+            self.data = DictWrapper(value)
+            self.__type = "dict"
+        elif isinstance(value, torch.Tensor):
+            self.data = TensorWrapper(value)
+            self.__type = "tensor"
         elif isinstance(value, int):
             self.data = int(value)
         elif isinstance(value, float):
@@ -33,7 +49,7 @@ class NumberWrapper(Wrapper):
         if "denominator" in dir(self.data):
             self.denominator = self.data.denominator
 
-    def set_number_type_from_str(self, num_str):
+    def set_number_type_from_str(self, num_str: str) -> Union[int, float, complex, str]:
         try:
             float(num_str)
             return float(num_str), "float"
@@ -55,10 +71,13 @@ class NumberWrapper(Wrapper):
         # TODO: convert to StringWrapper or TensorWrapper if trying to change reference to be a string or tensor
         return "not a valid number"
 
-    def to(self, new_value):
+    def to(
+        self, new_value: Union[int, float, complex, str, list, dict, torch.Tensor, Any]
+    ) -> Wrapper:
         self.set_value(new_value)
+        return self
 
-    def resolve(self):
+    def resolve(self) -> Union[int, float, complex]:
         return self.data
 
     # the follow overloaded inherited methods are defined in alphabetical order:

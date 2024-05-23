@@ -1,12 +1,13 @@
 import torch
 import numpy
 from PIL import Image
-from typing import Union, Any
 import sys
 import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from ..wrapper_interface import Wrapper
+from .wrapper_abc import Wrapper
+
+from typing import Union, Any
 
 
 class TensorWrapper(Wrapper):
