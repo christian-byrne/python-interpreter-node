@@ -9,15 +9,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { getWorkflowNodeByName } from "./get-workflow-data.js";
 import { nodeConfig } from "./config.js";
+function waitForAceInNamespace() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const startTime = new Date().getTime();
+        const aceLoaded = Object.keys(window).includes("ace");
+        console.debug(`Ace loaded on init: ${aceLoaded}`);
+        if (aceLoaded) {
+            return;
+        }
+        return new Promise((resolve) => {
+            const interval = setInterval(() => {
+                if (Object.keys(window).includes("ace")) {
+                    clearInterval(interval);
+                    console.debug(`Time to load ace: ${new Date().getTime() - startTime}ms`);
+                    resolve(null);
+                }
+            });
+        });
+    });
+}
 export function initAceInstance() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            yield waitForAceInNamespace();
             if (ace === null || ace === void 0 ? void 0 : ace.edit) {
                 console.debug("[onNodeCreated handler] Initializing ace editor for python code node");
                 let editor = ace.edit(nodeConfig.codeEditorId);
                 editor.setOptions({
                     tabSize: 2,
-                    useSoftTabs: true,
+                    // useSoftTabs: true,
                     wrap: true,
                     mode: "ace/mode/python",
                     theme: "ace/theme/github_dark",
@@ -26,6 +46,8 @@ export function initAceInstance() {
                     customScrollbar: true,
                     enableAutoIndent: true,
                 });
+                ace.require("ace/ext/language_tools");
+                ace.require("ace/ext/searchbox");
             }
         }
         catch (e) {
@@ -76,7 +98,8 @@ export function createAceDomElements(node) {
                 .edit(nodeConfig.codeEditorId)
                 .getSession()
                 .on("change", (e) => {
-                node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value = ace.edit(nodeConfig.codeEditorId).getValue();
+                node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value =
+                    ace.edit(nodeConfig.codeEditorId).getValue();
             });
         }
     });

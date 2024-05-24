@@ -17,12 +17,16 @@ const PythonInterpreterExtension: ComfyExtension = {
   init: async (app: ComfyApp) => {
     document.head.append(
       Object.assign(document.createElement("script"), {
-        src: "https://cdn.jsdelivr.net/npm/ace-builds@1.33.3/src-min-noconflict/ace.js",
+        src: "https://cdnjs.cloudflare.com/ajax/libs/ace/1.34.0/ace.min.js",
+        // src: `extensions/${nodeConfig.projectDirName}/lib/ace/mode-python.js`,
       })
     );
   },
   setup: async (app: ComfyApp) => {
-    initAceInstance();
+    const nodeActive = app.graph.findNodeByTitle(nodeConfig.nodeTitle);
+    if (nodeActive) {
+      initAceInstance();
+    }
   },
   getCustomWidgets: async (app: ComfyApp) => {
     return {};

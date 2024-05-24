@@ -1,9 +1,11 @@
 export const nodeConfig = {
   nodeTitle: "Python Interpreter",
+  projectDirName: "python-interpreter-node",
   nodeBackendName: "Exec Python Code Script",
   graphName: "Python Interpreter Node",
   codeEditorId: "python_code",
   hiddenInputId: "raw_code",
+  aceScriptId: "ace-script-python-interpreter-node",
   stdoutErrId: "output_text",
   placeholderCode: `"""Docs: https://github.com/christian-byrne/python-interpreter-node"""
 
@@ -15,7 +17,6 @@ number1.to(3.14) # Instead of number1 = 3.14
 from torchvision.transforms import ToPILImage
 image1.to(image1.squeeze(0).permute(2, 0, 1)) # From BHWC to CHW
 image1_pil = ToPILImage()(image1.data) # Use .data when passing as arg
-image1_pil.show()
 image1.to(image1.permute(1, 2, 0).unsqueeze(0)) # Back to BHWC
 
 # In all other cases, code behaves like normal python code

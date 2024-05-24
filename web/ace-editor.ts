@@ -5,8 +5,30 @@ import { LGraphNodeExtension } from "./types/comfy-app.js";
 
 declare var ace: Ace;
 
+async function waitForAceInNamespace() {
+  const startTime = new Date().getTime();
+  const aceLoaded = Object.keys(window).includes("ace");
+  console.debug(`Ace loaded on init: ${aceLoaded}`);
+  if (aceLoaded) {
+    return;
+  }
+
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (Object.keys(window).includes("ace")) {
+        clearInterval(interval);
+        console.debug(
+          `Time to load ace: ${new Date().getTime() - startTime}ms`
+        );
+        resolve(null);
+      }
+    });
+  });
+}
+
 export async function initAceInstance() {
   try {
+    await waitForAceInNamespace();
     if (ace?.edit) {
       console.debug(
         "[onNodeCreated handler] Initializing ace editor for python code node"
@@ -14,7 +36,7 @@ export async function initAceInstance() {
       let editor = ace.edit(nodeConfig.codeEditorId);
       editor.setOptions({
         tabSize: 2,
-        useSoftTabs: true,
+        // useSoftTabs: true,
         wrap: true,
         mode: "ace/mode/python",
         theme: "ace/theme/github_dark",
@@ -23,6 +45,8 @@ export async function initAceInstance() {
         customScrollbar: true,
         enableAutoIndent: true,
       });
+      ace.require("ace/ext/language_tools");
+      ace.require("ace/ext/searchbox");
     }
   } catch (e) {
     // TODO: handle error
@@ -56,18 +80,15 @@ export async function initAceInstance() {
 }
 
 export async function createAceDomElements(node: LGraphNodeExtension) {
-  const acePythonContainer = Object.assign(
-    document.createElement("div"),
-    {
-      id: nodeConfig.codeEditorId,
-      textContent: nodeConfig.placeholderCode, // most likely can remove this
-      style: {
-        width: "100%",
-        height: "100%",
-        position: "relative",
-      },
-    }
-  );
+  const acePythonContainer = Object.assign(document.createElement("div"), {
+    id: nodeConfig.codeEditorId,
+    textContent: nodeConfig.placeholderCode, // most likely can remove this
+    style: {
+      width: "100%",
+      height: "100%",
+      position: "relative",
+    },
+  });
 
   // Add ace editor container to the node on creation
   if (node.addDOMWidget !== undefined) {
@@ -89,9 +110,8 @@ export async function createAceDomElements(node: LGraphNodeExtension) {
       .edit(nodeConfig.codeEditorId)
       .getSession()
       .on("change", (e: Event) => {
-        node.widgets.find(
-          (w) => w.name === nodeConfig.hiddenInputId
-        ).value = ace.edit(nodeConfig.codeEditorId).getValue();
+        node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value =
+          ace.edit(nodeConfig.codeEditorId).getValue();
       });
   }
 }

@@ -8,7 +8,7 @@
 
 ## Description
 
-- Write Python code the node that executes when the workflow is queued
+- Write Python code in a node that executes when the workflow is queued
 - The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
 - The input values can be accessed by their UI name. 
 - The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.

@@ -15,11 +15,15 @@ const PythonInterpreterExtension = {
     name: nodeConfig.graphName,
     init: (app) => __awaiter(void 0, void 0, void 0, function* () {
         document.head.append(Object.assign(document.createElement("script"), {
-            src: "https://cdn.jsdelivr.net/npm/ace-builds@1.33.3/src-min-noconflict/ace.js",
+            src: "https://cdnjs.cloudflare.com/ajax/libs/ace/1.34.0/ace.min.js",
+            // src: `extensions/${nodeConfig.projectDirName}/lib/ace/mode-python.js`,
         }));
     }),
     setup: (app) => __awaiter(void 0, void 0, void 0, function* () {
-        initAceInstance();
+        const nodeActive = app.graph.findNodeByTitle(nodeConfig.nodeTitle);
+        if (nodeActive) {
+            initAceInstance();
+        }
     }),
     getCustomWidgets: (app) => __awaiter(void 0, void 0, void 0, function* () {
         return {};
