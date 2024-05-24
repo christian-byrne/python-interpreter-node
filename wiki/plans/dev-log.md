@@ -1,11 +1,23 @@
+
+Features Implemented so Far:
+- [x] Code execution (5/16)
+- [x] Input value modification and output (5/17)
+- [x] Stdout/err display (5/19)
+- [x] Output value assignment/pipe (5/19)
+- [x] Code editor plugin (5/22)
+  - On code-editor-dev branch. Need to test more before merging. 
+- [x] ~~Dynamic inputs/outputs~~ (5/23)
+- [ ] Testing
+- [ ] Docs/Examples
+
 # Plan
 
-- [ ] Finish core features
+- [x] Finish core features
   - [x] Code execution
     - [x] Error hints and tracebacks
   - [ ] Dynamic inputs/outputs
   - [x] Stdout display
-  - [ ] Code editor js library
+  - [x] Code editor js library
   - [x] Solution to the input/output assignment issue: You can modify shared variables in the `exec` scope, but can't re-assign them. Assignment just creates a new local variable in the `exec` scope (which then as a result loses a way to reference the shared variable). Possible solutions:
     - ❌ - ~~Create a closure that takes in the shared variables and returns a function that can access them~~
     - ✅ Make the shared variable an attribute of a singleton instance and overload the `__setattr__` method of that class
@@ -41,5 +53,5 @@
 
 - [x] Refactor file structure
 - [ ] Add some `ANY` inputs/outputs (type `ANY`, names `any1`, `any2`). Add some common custom types and wrappers for them
-- [ ] Add generalized/generic wrapper
-- [ ] Add wrappers/inputs for the other builtin types like `LATENT`
+- [x] Add generalized/generic wrapper
+- [ ] `LATENT` -> handled by tensor wrapper

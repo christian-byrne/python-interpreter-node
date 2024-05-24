@@ -1,25 +1,17 @@
 # Python Interpreter ComfyUI Node
 
-![alt text](wiki/pictures/demos/new-example-caption-draw.png)
+![demo video](wiki/demos/videos/demo.mp4)
 
-![alt text](wiki/pictures/demos/new-example-complementary-colors.png)
+![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
+
+![demo picture = caption composite](wiki/demos/pictures/new-example-caption-draw.png)
 
 ## Description
 
-- Allows you to write Python code in the textarea of the node which executes when the workflow is queued
+- Write Python code the node that executes when the workflow is queued
 - The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
 - The input values can be accessed by their UI name. 
 - The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.
-
-Features Implemented so Far:
-- [x] Code execution (5/16)
-- [x] Input value modification and output (5/17)
-- [x] Stdout/err display (5/19)
-- [x] Output value assignment/pipe (5/19)
-- [x] Code editor plugin (5/22)
-  - On code-editor-dev branch. Need to test more before merging. 
-- [ ] Dynamic inputs/outputs
-- [ ] Testing and Docs
 
 ## Reason to Use
 
@@ -72,3 +64,10 @@ Features Implemented so Far:
       print(image1) # works
       print(len(text1)) # works
       ```
+
+## Examples
+
+- [Automatically get color palette and complements from image](wiki/code-snippets-from-demos/get_complementary_colors.py)
+- [Most recent image in folder](wiki/code-snippets-from-demos//most_recent_image_in_folder.py)
+- [Paste text on image](wiki/code-snippets-from-demos/paste_text_caption.py)
+- ...[More snippets in wiki](wiki/code-snippets-from-demos)

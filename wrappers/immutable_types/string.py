@@ -16,6 +16,7 @@ class StringWrapper(UserString, Wrapper):
         while isinstance(new_value, Wrapper):
             new_value = new_value.resolve()
 
+        self.data = new_value
         return self
 
     def resolve(self) -> str:

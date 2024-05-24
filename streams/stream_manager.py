@@ -14,7 +14,7 @@ class StandardStreamManager:
 
         self.hints = {
             "RuntimeError": "Check that your code is not causing an infinite loop or that it is not using too much memory.",
-            "TypeError": "If you are referencing an input variable, make sure you are actually piping something in to that slot and that the value is of the correct type. If you want to reference an image/mask's tensor, use the tensor attribute (e.g., image1.tensor).",
+            "TypeError": "If you are referencing an input variable, make sure you are actually piping something in to that slot and that the value is of the correct type. If you want to reference an image/mask's tensor, use the data attribute (e.g., image1.data).",
             "ImportError": "Use pip install to install any missing libraries. Ensure you install with same version of python or same env you use to run ComfyUI.",
             "NameError": "Check that the variable names used in your code match the input variables and that you included all necessary imports. Don't try to change the names of the input variables from how they appear in the UI.",
         }
