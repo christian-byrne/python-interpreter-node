@@ -1,6 +1,6 @@
 # Python Interpreter ComfyUI Node
 
-![demo video](wiki/demos/videos/demo.mp4)
+![demo video](wiki/demos/videos/demo.gif)
 
 ![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
 
