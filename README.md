@@ -80,3 +80,7 @@
 - [Most recent image in folder](wiki/code-snippets-from-demos//most_recent_image_in_folder.py)
 - [Paste text on image](wiki/code-snippets-from-demos/paste_text_caption.py)
 - ...[More snippets in wiki](wiki/code-snippets-from-demos)
+
+----
+
+*Disclaimer: Do not put this on a server that is accessible to the public. This node can run any Python code provided by a user, including malicious code.*

@@ -88,7 +88,14 @@ export function createAceDomElements(node) {
         if (node.addDOMWidget !== undefined) {
             node.addDOMWidget(nodeConfig.codeEditorId, "customtext", acePythonContainer, {
                 getValue: function () {
-                    return ace.edit(nodeConfig.codeEditorId).getValue();
+                    try {
+                        if (ace === null || ace === void 0 ? void 0 : ace.edit) {
+                            return ace.edit(nodeConfig.codeEditorId).getValue();
+                        }
+                    }
+                    catch (e) {
+                        console.error("[onNodeCreated handler] Error trying to get value from ace editor for python code node", e);
+                    }
                 },
             });
         }

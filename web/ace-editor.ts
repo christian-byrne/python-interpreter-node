@@ -98,7 +98,16 @@ export async function createAceDomElements(node: LGraphNodeExtension) {
       acePythonContainer,
       {
         getValue: function () {
-          return ace.edit(nodeConfig.codeEditorId).getValue();
+          try {
+            if (ace?.edit) {
+              return ace.edit(nodeConfig.codeEditorId).getValue();
+            }
+          } catch (e) {
+            console.error(
+              "[onNodeCreated handler] Error trying to get value from ace editor for python code node",
+              e
+            );
+          }
         },
       }
     );
