@@ -1,14 +1,16 @@
-import { LGraph, LGraphNode, IWidget } from "@comfy-main-web/types/litegraph.js";
-import { ComfyUI } from "../web/scripts/ui";
-
-export interface ComfyWidgetUIWrapper {
-  widget: ComfyWidget;
-  minHeight?: number;
-  minWidth?: number;
-}
+import {
+  LGraph,
+  LGraphNode,
+  IWidget,
+} from "@comfy-main-web/types/litegraph.js";
+import { ComfyUI } from "../web/scripts/ui.js";
+import { ComfyExtension } from "@comfy-main-web/types/comfy.js";
+import { ContextMenuItem } from "@comfy-main-web/types/litegraph.js";
+import { LGraphNodeExtended } from "./comfy-app.js";
+import { WidgetOptions } from "./widgets.js";
 
 // --------------------------------------------------------------
-// From comfy_mtb:
+// Originally from comfy_mtb
 
 export interface ComfyApp {
   graph: LGraph;
@@ -28,11 +30,20 @@ export interface ComfyApp {
 }
 
 export declare class LGraphNodeExtension extends LGraphNode {
+  /**
+   * Adds a DOM widget to the application.
+   *
+   * @param name - The name of the widget.
+   * @param type - The type of the widget.
+   * @param element - The DOM element that represents the widget.
+   * @param options - Additional options for the widget.
+   * @returns The created widget.
+   */
   addDOMWidget?: (
     name: string,
     type: string,
-    element: Element,
-    options: Record<string, unknown>
+    element: HTMLElement,
+    options: WidgetOptions 
   ) => IWidget;
   onNodeCreated?: () => void;
   getExtraMenuOptions?: () => ContextMenuItem[];
@@ -50,32 +61,3 @@ export declare class LGraphNodeExtension extends LGraphNode {
 }
 
 export type NodeType = typeof LGraphNodeExtension;
-
-// --------------------------------------------------------------
-
-export interface WidgetOptions extends Record<string, any> {
-  getValue: () => any;
-  setValue?: (value: any) => void;
-
-  hideOnZoomOut?: boolean;
-  selection?: string[];
-  max?: number;
-  min?: number;
-  precision?: number;
-  round?: number;
-  step?: number;
-
-  on?: string;
-  off?: string;
-}
-
-export interface ComfyWidget extends IWidget {
-  onRemove?: () => void;
-
-  value?: any;
-  options: WidgetOptions;
-  last_y?: number;
-  computedHeight?: number;
-  element?: HTMLElement;
-  inputEl?: HTMLInputElement;
-}
