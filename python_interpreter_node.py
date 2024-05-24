@@ -12,23 +12,13 @@ from typing import Optional, List, Union, Any, Dict
 
 
 class PythonInterpreter:
-    CODE_PLACEHOLDER = "\n".join(
-        [
-            "print(image1, image2, mask1, mask2, number1, number2, sep='\\n')",
-            "print(text1, text2, dict1, dict2, list1, list2, sep='\\n')",
-        ]
-    )
-
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "raw_code": (
-                    "STRING",
-                    {
-                        "default": "",
-                    },
-                ),
+                "raw_code": ("STRING",{
+                    "default": "",
+                }),
             },
             "optional": {
                 "image1": ("IMAGE",),
@@ -42,7 +32,7 @@ class PythonInterpreter:
                     },
                 ),
                 "number2": (
-                    "FLOAT",
+                    "INT",
                     {
                         "default": 0,
                     },
@@ -118,10 +108,10 @@ class PythonInterpreter:
         "dict1",
         "dict2",
     )
+    CATEGORY = "x"
 
     def run(
         self,
-        # TODO: litegraph adds input dynamically then passes as a hidden input the reference dict, for which we use to map Wrappers to keys, so that this is all done dynamically
         raw_code: str = "",
         image1: Optional[torch.Tensor] = None,
         image2: Optional[torch.Tensor] = None,
