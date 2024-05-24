@@ -1,4 +1,4 @@
-# Python Interpreter ComfyUI Node
+# Python Interpreter ComfyUI Node 🐍
 
 ![demo video](wiki/demos/videos/demo.gif)
 
@@ -12,6 +12,15 @@
 - The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
 - The input values can be accessed by their UI name. 
 - The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.
+
+## Requirements
+
+- python 3.10+
+
+## Installation
+
+1. `cd` int `ComfyUI/custom_nodes` directory
+2. `git clone` this repository
 
 ## Reason to Use
 
