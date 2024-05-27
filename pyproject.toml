@@ -1,8 +1,15 @@
-[tool.poetry]
+[project]
 name = "python-interpreter-node"
-version = "0.1.0"
-description = "Python interpreter node for ComfyUI"
-authors = ["christian-byrne"]
+description = "Python interpreter to embed scripts into workflows and debug custom nodes."
+version = "1.0.0"
+license = "LICENSE"
+dependencies = ["Pillow>=10.3.0"]
 
-[tool.poetry.dependencies]
-python = "^3.10"
+[project.urls]
+Repository = "https://github.com/christian-byrne/python-interpreter-node"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "christian-byrne"
+DisplayName = "python-interpreter-node"
+Icon = ""

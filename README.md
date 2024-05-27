@@ -2,10 +2,6 @@
 
 ![demo video](wiki/demos/videos/demo.gif)
 
-![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
-
-![demo picture = caption composite](wiki/demos/pictures/new-example-caption-draw.png)
-
 ## Description
 
 - Write Python code in a node that executes when the workflow is queued
@@ -73,13 +69,20 @@
       print(image1) # works
       print(len(text1)) # works
       ```
+- To understand the type and shape of the input images/masks, please refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks).
 
 ## Examples
+
+![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
+
+![demo picture = caption composite](wiki/demos/pictures/new-example-caption-draw.png)
+
 
 - [Automatically get color palette and complements from image](wiki/code-snippets-from-demos/get_complementary_colors.py)
 - [Most recent image in folder](wiki/code-snippets-from-demos//most_recent_image_in_folder.py)
 - [Paste text on image](wiki/code-snippets-from-demos/paste_text_caption.py)
 - ...[More snippets in wiki](wiki/code-snippets-from-demos)
+
 
 ----
 
