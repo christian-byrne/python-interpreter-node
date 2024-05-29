@@ -1,5 +1,4 @@
 
-Features Implemented so Far:
 - [x] Code execution (5/16)
 - [x] Input value modification and output (5/17)
 - [x] Stdout/err display (5/19)
@@ -24,6 +23,7 @@ Features Implemented so Far:
     - ❌ ~~Regex replace assignments with setter method calls~~
     - ❌ ~~Create new method to replace assignments and leave it to the user to use it~~
 - [x] Decide whether to try to splice/parse `return` statements and values and dynamically add them to UI in real-time 
+- [ ] Security
 - [ ] Test core features
 - [ ] Document
 - [x] Consider actual use cases and functionality and then deicde whether to finish the tensor wrapper class. If implementing:
@@ -42,8 +42,9 @@ Features Implemented so Far:
   - Write the code to a python file in the custom_nodes folder, after doing the neccessary setup tasks
 - Interactive Console
   - Save locals binaries per queued execution, then reference them in the console so that it can be used anytime 
+- state machine
 - Dynamic Inputs/Outputs
-- Code Editor JS library integration
+- ~~Code Editor JS library integration~~
 - embedded python favicon
 - Add dynamic info into the CODE_PLACEHOLDER
   - python version
@@ -52,6 +53,6 @@ Features Implemented so Far:
 ## Non-Urgent TODO
 
 - [x] Refactor file structure
-- [ ] Add some `ANY` inputs/outputs (type `ANY`, names `any1`, `any2`). Add some common custom types and wrappers for them
+- [x] ANY data types are universally compatible
 - [x] Add generalized/generic wrapper
 - [ ] `LATENT` -> handled by tensor wrapper

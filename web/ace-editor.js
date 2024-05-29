@@ -11,9 +11,7 @@ import { getWorkflowNodeByName } from "./get-workflow-data.js";
 import { nodeConfig } from "./config.js";
 function waitForAceInNamespace() {
     return __awaiter(this, void 0, void 0, function* () {
-        const startTime = new Date().getTime();
         const aceLoaded = Object.keys(window).includes("ace");
-        console.debug(`Ace loaded on init: ${aceLoaded}`);
         if (aceLoaded) {
             return;
         }
@@ -21,7 +19,6 @@ function waitForAceInNamespace() {
             const interval = setInterval(() => {
                 if (Object.keys(window).includes("ace")) {
                     clearInterval(interval);
-                    console.debug(`Time to load ace: ${new Date().getTime() - startTime}ms`);
                     resolve(null);
                 }
             });
@@ -33,11 +30,9 @@ export function initAceInstance() {
         try {
             yield waitForAceInNamespace();
             if (ace === null || ace === void 0 ? void 0 : ace.edit) {
-                console.debug("[onNodeCreated handler] Initializing ace editor for python code node");
                 let editor = ace.edit(nodeConfig.codeEditorId);
                 editor.setOptions({
                     tabSize: 2,
-                    // useSoftTabs: true,
                     wrap: true,
                     mode: "ace/mode/python",
                     theme: "ace/theme/github_dark",
@@ -51,7 +46,6 @@ export function initAceInstance() {
             }
         }
         catch (e) {
-            // TODO: handle error
             console.error("[onNodeCreated handler] Error trying to initialize ace editor for python code node", e);
         }
         // Load code from workflow into editor. Call aftering rendering so all node props are defined.
@@ -63,7 +57,6 @@ export function initAceInstance() {
             if (persistentCode &&
                 persistentCode.replace(/\s/g, "") !== "" &&
                 persistentCode !== nodeConfig.placeholderCode) {
-                console.info("[setup] Persistent Python Code session detected. Loading from history");
                 savedSession = !savedSession;
                 ace.edit(nodeConfig.codeEditorId).setValue(persistentCode);
             }
@@ -77,7 +70,7 @@ export function createAceDomElements(node) {
     return __awaiter(this, void 0, void 0, function* () {
         const acePythonContainer = Object.assign(document.createElement("div"), {
             id: nodeConfig.codeEditorId,
-            textContent: nodeConfig.placeholderCode, // most likely can remove this
+            textContent: nodeConfig.placeholderCode,
             style: {
                 width: "100%",
                 height: "100%",

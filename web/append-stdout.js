@@ -15,15 +15,11 @@ export function appendStdoutWidget(node, liteGraph, data) {
         var _a, _b;
         const insertIndex = node.widgets.findIndex((w) => w.name === nodeConfig.stdoutErrId);
         if (insertIndex !== -1) {
-            console.debug(`[onExecuted handler] Removing existing ${nodeConfig.stdoutErrId} widgets after insert index`);
             for (let i = insertIndex; i < node.widgets.length; i++) {
                 (_b = (_a = node.widgets[i]).onRemove) === null || _b === void 0 ? void 0 : _b.call(_a);
                 liteGraph.setDirtyCanvas(true, true);
             }
             node.widgets.length = insertIndex;
-        }
-        else {
-            console.debug(`[onExecuted handler] No existing ${nodeConfig.stdoutErrId} widgets found. Nothing to remove...`);
         }
         const outputWidget = ComfyWidgets["STRING"](node, nodeConfig.stdoutErrId, ["STRING", { multiline: true }], app).widget;
         outputWidget.value = data.text.join("");
