@@ -1,8 +1,3 @@
-
-
-
-# --- Picture: example1-caption_composite.png
-
 from PIL import ImageDraw, ImageFont
 from torchvision import transforms
 

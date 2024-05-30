@@ -1,6 +1,5 @@
-
 def subtract_mask_from_img(img, mask):
-    # RGBA - A
+    # RGBA minus A
     if img.shape[3] == 4:
         subtracted_alphas = torch.min(img[0][:, :, 3], mask[0])
         return torch.cat(
@@ -10,7 +9,7 @@ def subtract_mask_from_img(img, mask):
             ),
             dim=2,
         ).unsqueeze(0)
-    # RGB - A
+    # RGB minus A
     else:
         return torch.cat((img[0][:, :, :3], mask[0].unsqueeze(2)), dim=2).unsqueeze(
             0

@@ -1,4 +1,3 @@
-
 from textgenrnn import textgenrnn
 
 # Initialize textgenrnn model

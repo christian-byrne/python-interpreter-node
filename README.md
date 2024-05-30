@@ -7,7 +7,7 @@
 - Write Python code in a node that executes when the workflow is queued
 - The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
 - The input values can be accessed by their UI name. 
-- The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.
+- The output values are the same as the input values, changes made to input values in the code are reflected in the output values.
 
 ## Requirements
 
@@ -20,14 +20,13 @@
 
 ## Reason to Use
 
-- Anything that can be done with Python code
-- Embedding little scripts into your saved workflows
-- Quickly make a node that can do a specialized task
+- Embedding scripts into workflows
+- Specialized tasks
 - Converting types
-- Doing math with input values
+- Doing math
 - Debugging
-- Testing custom nodes faster.
-- Even if you can't code, you can ask ChatGPT to write a python snippet for you to accomplish a tedious task
+- Testing custom nodes
+- Even if you can't code, you can ask ChatGPT to write a python snippet
 
 
 ## Usage
@@ -70,6 +69,7 @@
       print(len(text1)) # works
       ```
 - To understand the type and shape of the input images/masks, please refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks).
+
 
 ## Examples
 
