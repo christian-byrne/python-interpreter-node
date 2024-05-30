@@ -8,7 +8,7 @@ from collections import deque
 from typing import Union, Any
 
 
-class DequeWrapper(Wrapper):
+class DequeWrapper(Wrapper, deque):
     def __init__(self, value: deque):
         self.data = value
 
