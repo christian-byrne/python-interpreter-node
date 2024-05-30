@@ -12,7 +12,6 @@ class NumberWrapper(Wrapper):
         self.set_value(value)
 
     def set_value(self, value: Union[int, float, complex, str]) -> None:
-        # TODO: from hex, from oct, from bin
         if isinstance(value, int):
             self.data = int(value)
         elif isinstance(value, float):
@@ -47,7 +46,17 @@ class NumberWrapper(Wrapper):
             return complex(num_str)
         except ValueError:
             pass
-        return "inf"
+        
+        if num_str.startswith("0x"):
+            return int(num_str, 16)
+        elif num_str.startswith("0o"):
+            return int(num_str, 8)
+        elif num_str.startswith("0b"):
+            return int(num_str, 2)
+        elif num_str in ["inf", "infinity"]:
+            return float("inf")
+        
+        return num_str
 
     def to(self, new_value: Union[Wrapper, Any]) -> Wrapper:
         while isinstance(new_value, Wrapper):

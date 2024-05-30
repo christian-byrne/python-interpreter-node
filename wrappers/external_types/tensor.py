@@ -21,6 +21,10 @@ class TensorWrapper(Wrapper):
         return self.data
 
     def to(self, tensor: Union[torch.Tensor, Wrapper, numpy.ndarray, Image.Image, Any]):
+        if isinstance(tensor, str) and tensor in ["cpu", "cuda"]:
+            self.data = self.data.to(tensor)
+            return self
+        
         while isinstance(tensor, Wrapper):
             tensor = tensor.resolve()
 

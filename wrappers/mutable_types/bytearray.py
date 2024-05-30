@@ -51,7 +51,7 @@ class ByteArrayWrapper(Wrapper):
         else:
             del self.data[attr]
 
-    # The following operations act as if they are the tensor.
+    # The following operations act as if they are the bytearray.
     # Listed in alphabetical order.
 
     def __abs__(self):
