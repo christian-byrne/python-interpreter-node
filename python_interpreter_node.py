@@ -135,20 +135,20 @@ class PythonInterpreter:
         unique_id=None,
         extra_pnginfo=None,
     ) -> Dict[str, Any]:
-        self.image1 = WrapperFactory.create_wrapper(image1)
-        self.image2 = WrapperFactory.create_wrapper(image2)
-        self.mask1 = WrapperFactory.create_wrapper(mask1)
-        self.mask2 = WrapperFactory.create_wrapper(mask2)
-        self.number1 = WrapperFactory.create_wrapper(number1)
-        self.number2 = WrapperFactory.create_wrapper(number2)
-        self.text1 = WrapperFactory.create_wrapper(text1)
-        self.text2 = WrapperFactory.create_wrapper(text2)
-        self.list1 = WrapperFactory.create_wrapper(list1)
-        self.dict1 = WrapperFactory.create_wrapper(dict1)
-        self.any1 = WrapperFactory.create_wrapper(any1)
-        self.any2 = WrapperFactory.create_wrapper(any2)
-        self.any3 = WrapperFactory.create_wrapper(any3)
-        self.any4 = WrapperFactory.create_wrapper(any4)
+        self.image1 = WrapperFactory(image1)
+        self.image2 = WrapperFactory(image2)
+        self.mask1 = WrapperFactory(mask1)
+        self.mask2 = WrapperFactory(mask2)
+        self.number1 = WrapperFactory(number1)
+        self.number2 = WrapperFactory(number2)
+        self.text1 = WrapperFactory(text1)
+        self.text2 = WrapperFactory(text2)
+        self.list1 = WrapperFactory(list1)
+        self.dict1 = WrapperFactory(dict1)
+        self.any1 = WrapperFactory(any1)
+        self.any2 = WrapperFactory(any2)
+        self.any3 = WrapperFactory(any3)
+        self.any4 = WrapperFactory(any4)
 
         self.shared_ref_dict = self.__map_ref_dict(
             [
