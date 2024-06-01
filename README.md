@@ -15,7 +15,7 @@
 
 ## Installation
 
-1. `cd` int `ComfyUI/custom_nodes` directory
+1. `cd` into `ComfyUI/custom_nodes` directory
 2. `git clone` this repository
 
 ## Reason to Use
@@ -68,8 +68,8 @@
       print(image1) # works
       print(len(text1)) # works
       ```
-- To understand the type and shape of the input images/masks, please refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks).
-
+- To understand the type and shape of some of the inputs, please refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks).
+- This situation is unlikely to occur, but try to avoid re-assigning variables to objects of a different type. You may lose access to some instance methods. If it must be done (e.g., to get an ouput of a novel type), just do it at the end of the code, and use your own variables in the meantime.
 
 ## Examples
 
