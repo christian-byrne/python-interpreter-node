@@ -37,14 +37,12 @@ const PythonInterpreterExtension = {
             const liteGraph = app.graph;
             constructorPrototype.onNodeCreated = function () {
                 const node = this;
-                console.debug("[onNodeCreated Handler] Node created:", node);
                 if (node.title == nodeConfig.nodeTitle) {
                     createAceDomElements(node);
                 }
             };
             constructorPrototype.onExecuted = function (data) {
                 const node = this;
-                console.debug("[onExecuted handler] Node executed:", node);
                 if (node.widgets) {
                     appendStdoutWidget(node, liteGraph, data);
                 }

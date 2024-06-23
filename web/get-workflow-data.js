@@ -16,7 +16,6 @@ export function getWorkflowData() {
                 if (api.clientId) {
                     workflowData = sessionStorage.getItem(`workflow-${api.clientId}`);
                     if (!workflowData) {
-                        console.warn(`No workflow data found in session storage for client ID: ${api.clientId}`);
                         // Try to fallback to local storage.
                         workflowData = localStorage.getItem("workflow");
                     }
