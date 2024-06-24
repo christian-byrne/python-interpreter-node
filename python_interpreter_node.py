@@ -10,6 +10,12 @@ from .streams.stream_manager import StandardStreamManager
 
 from typing import Optional, List, Union, Any, Dict, Set
 
+# From: https://github.com/pythongosssss/ComfyUI-Custom-Scripts
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+# Our any instance wants to be a wildcard string
+any = AnyType("*")
 
 class PythonInterpreter:
     @classmethod
@@ -80,20 +86,20 @@ class PythonInterpreter:
     FUNCTION = "run"
     OUTPUT_NODE = True
     RETURN_TYPES = (
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
-        "*",
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
     )
     RETURN_NAMES = (
         "image1",
