@@ -2,6 +2,18 @@
 
 ![demo video](wiki/demos/videos/demo.gif)
 
+> [!TIP] Installing via ComfyUI Manager
+>  To install via manager, you must first open the ComfyUI Manager settings and set the `channels` setting to `dev`:
+>
+> <details>
+>
+> <summary> &nbsp; See Picture of Specified Setting </summary>
+> 
+> ![](wiki/comfyui-manager-setting.png)
+>
+> </details>
+>
+
 ## Description
 
 - Write Python code that executes when the workflow is queued
@@ -18,15 +30,7 @@
 1. `cd` into `ComfyUI/custom_nodes` directory
 2. `git clone` this repository
 
-## Reason to Use
-
-- Specialized tasks
-- Converting types
-- Doing math
-- Debugging
-- Testing custom nodes
-- Embedding scripts into workflows
-
+To install via ComfyUI Manager, set the `channels` setting to `dev` and search for `Python Interpreter` in the manager.
 
 ## Usage
 
