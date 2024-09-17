@@ -2,14 +2,16 @@
 
 ![demo video](wiki/demos/videos/demo.gif)
 
-> [!TIP] Installing via ComfyUI Manager
->  To install via manager, you must first open the ComfyUI Manager settings and set the `channels` setting to `dev`:
+> [!TIP]
+>  To install via manager, you must first open the ComfyUI Manager settings and set the `channel` setting to `dev`:
+>
+>
 >
 > <details>
 >
 > <summary> &nbsp; See Picture of Specified Setting </summary>
 > 
-> ![](wiki/comfyui-manager-setting.png)
+> ![channel setting in comfyui manager](wiki/comfyui-manager-setting.png)
 >
 > </details>
 >
