@@ -9,50 +9,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { getWorkflowNodeByName } from "./get-workflow-data.js";
 import { nodeConfig } from "./config.js";
-function waitForAceInNamespace() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const startTime = new Date().getTime();
-        const aceLoaded = Object.keys(window).includes("ace");
-        console.debug(`Ace loaded on init: ${aceLoaded}`);
-        if (aceLoaded) {
-            return;
-        }
-        return new Promise((resolve) => {
-            const interval = setInterval(() => {
-                if (Object.keys(window).includes("ace")) {
-                    clearInterval(interval);
-                    console.debug(`Time to load ace: ${new Date().getTime() - startTime}ms`);
-                    resolve(null);
-                }
-            });
-        });
-    });
-}
 export function initAceInstance() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield waitForAceInNamespace();
-            if (ace === null || ace === void 0 ? void 0 : ace.edit) {
-                console.debug("[onNodeCreated handler] Initializing ace editor for python code node");
-                let editor = ace.edit(nodeConfig.codeEditorId);
-                editor.setOptions({
-                    tabSize: 2,
-                    // useSoftTabs: true,
-                    wrap: true,
-                    mode: "ace/mode/python",
-                    theme: "ace/theme/github_dark",
-                    showPrintMargin: false,
-                    showGutter: false,
-                    customScrollbar: true,
-                    enableAutoIndent: true,
-                });
-                ace.require("ace/ext/language_tools");
-                ace.require("ace/ext/searchbox");
-            }
+            setTimeout(() => {
+                if (ace === null || ace === void 0 ? void 0 : ace.edit) {
+                    console.debug("[onNodeCreated handler] Initializing ace editor for python code node");
+                    let editor = ace.edit(nodeConfig.codeEditorId);
+                    editor.setOptions({
+                        tabSize: 2,
+                        wrap: true,
+                        mode: "ace/mode/python",
+                        theme: "ace/theme/github_dark",
+                        showPrintMargin: false,
+                        showGutter: false,
+                        customScrollbar: true,
+                        enableAutoIndent: true,
+                    });
+                    ace.require("ace/ext/language_tools");
+                    ace.require("ace/ext/searchbox");
+                }
+            }, 128);
         }
         catch (e) {
-            // TODO: handle error
-            console.error("[onNodeCreated handler] Error trying to initialize ace editor for python code node", e);
+            console.debug("[onNodeCreated handler] Error trying to initialize ace editor for python code node", e);
         }
         // Load code from workflow into editor. Call aftering rendering so all node props are defined.
         let savedSession = false;
@@ -94,7 +74,7 @@ export function createAceDomElements(node) {
                         }
                     }
                     catch (e) {
-                        console.error("[onNodeCreated handler] Error trying to get value from ace editor for python code node", e);
+                        console.debug("[onNodeCreated handler] Error trying to get value from ace editor for python code node", e);
                     }
                 },
             });

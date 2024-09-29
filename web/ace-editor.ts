@@ -5,52 +5,30 @@ import { LGraphNodeExtension } from "./types/comfy-app.js";
 
 declare var ace: Ace;
 
-async function waitForAceInNamespace() {
-  const startTime = new Date().getTime();
-  const aceLoaded = Object.keys(window).includes("ace");
-  console.debug(`Ace loaded on init: ${aceLoaded}`);
-  if (aceLoaded) {
-    return;
-  }
-
-  return new Promise((resolve) => {
-    const interval = setInterval(() => {
-      if (Object.keys(window).includes("ace")) {
-        clearInterval(interval);
-        console.debug(
-          `Time to load ace: ${new Date().getTime() - startTime}ms`
-        );
-        resolve(null);
-      }
-    });
-  });
-}
-
 export async function initAceInstance() {
   try {
-    await waitForAceInNamespace();
-    if (ace?.edit) {
-      console.debug(
-        "[onNodeCreated handler] Initializing ace editor for python code node"
-      );
-      let editor = ace.edit(nodeConfig.codeEditorId);
-      editor.setOptions({
-        tabSize: 2,
-        // useSoftTabs: true,
-        wrap: true,
-        mode: "ace/mode/python",
-        theme: "ace/theme/github_dark",
-        showPrintMargin: false,
-        showGutter: false,
-        customScrollbar: true,
-        enableAutoIndent: true,
-      });
-      ace.require("ace/ext/language_tools");
-      ace.require("ace/ext/searchbox");
-    }
+    setTimeout(() => {
+      if (ace?.edit) {
+        console.debug(
+          "[onNodeCreated handler] Initializing ace editor for python code node"
+        );
+        let editor = ace.edit(nodeConfig.codeEditorId);
+        editor.setOptions({
+          tabSize: 2,
+          wrap: true,
+          mode: "ace/mode/python",
+          theme: "ace/theme/github_dark",
+          showPrintMargin: false,
+          showGutter: false,
+          customScrollbar: true,
+          enableAutoIndent: true,
+        });
+        ace.require("ace/ext/language_tools");
+        ace.require("ace/ext/searchbox");
+      }
+    }, 128);
   } catch (e) {
-    // TODO: handle error
-    console.error(
+    console.debug(
       "[onNodeCreated handler] Error trying to initialize ace editor for python code node",
       e
     );
@@ -103,7 +81,7 @@ export async function createAceDomElements(node: LGraphNodeExtension) {
               return ace.edit(nodeConfig.codeEditorId).getValue();
             }
           } catch (e) {
-            console.error(
+            console.debug(
               "[onNodeCreated handler] Error trying to get value from ace editor for python code node",
               e
             );

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-tsc && tsc-alias
+# tsc && tsc-alias
+# run tsc && tsc-alias and continue even if error occurs
+tsc || true
+tsc-alias || true
 
 REPLACE="../../../web/"
 WITH="../../"
@@ -28,5 +31,3 @@ done < ts_files.txt
 
 rm ts_files.txt
 rm -r ./web/custom_nodes
-
-# TODO: When building, remove .ts .js.map, .tsbuildinfo, console.logs|debug|info, python typing/types

@@ -1,4 +1,5 @@
 export const nodeConfig = {
+  aceLibPath: "/lib-ace/ace.js",
   nodeTitle: "Python Interpreter",
   projectDirName: "python-interpreter-node",
   nodeBackendName: "Exec Python Code Script",
