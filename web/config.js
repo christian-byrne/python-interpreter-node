@@ -56,7 +56,7 @@ image1.to(image1.permute(1, 2, 0).unsqueeze(0)) # Back to BHWC
 # In all other cases, code behaves like normal python code
 # Any variables you define yourself will behave as expected
 print(image1, image2, mask1, mask2, number1, number2, sep='\\n')
-print(text1, text2, dict1, list1, any1, any2, any3, sep='\\n')
+print(text1, text2, dict1, dict2, list1, list2, sep='\\n')
 
 `,
 };

@@ -36,23 +36,20 @@ const PythonInterpreterExtension = {
             options: nodeConfig.themes,
         });
     }),
-    nodeCreated: (node) => __awaiter(void 0, void 0, void 0, function* () {
-        console.debug("[onNodeCreated Handler] Node created:", node);
-    }),
     beforeRegisterNodeDef: (nodeType, nodeData, app) => __awaiter(void 0, void 0, void 0, function* () {
         if ((nodeData === null || nodeData === void 0 ? void 0 : nodeData.name) == nodeConfig.nodeBackendName) {
             const constructorPrototype = nodeType.prototype;
             const liteGraph = app.graph;
+            // Create ace-editor DOM elements and listeners.
             constructorPrototype.onNodeCreated = function () {
                 const nodePrototype = this;
                 if (nodePrototype.title == nodeConfig.nodeTitle) {
                     const editorId = createUniqueID();
-                    console.debug("[onNodeCreated Handler] Node created:", nodePrototype);
-                    console.debug("[onNodeCreated Handler] Editor ID:", editorId);
                     initAceInstance(nodePrototype, editorId);
                     createAceDomElements(nodePrototype, editorId);
                 }
             };
+            // Add a new widget to display the stdout/stderr after execution.
             constructorPrototype.onExecuted = function (data) {
                 const node = this;
                 if (node.widgets) {
