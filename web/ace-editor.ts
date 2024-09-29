@@ -1,6 +1,7 @@
 import { Ace } from "./types/ace.js";
 import { nodeConfig } from "./config.js";
 import { LGraphNodeExtension } from "./types/comfy-app.js";
+import { app } from "@comfy-main-web/scripts/app.js";
 
 declare var ace: Ace;
 
@@ -15,12 +16,14 @@ export async function initAceInstance(
         const savedCode = node?.widgets_values?.length
           ? node.widgets_values[0]
           : nodeConfig.placeholderCode;
+        const userTheme = app.ui.settings.getSettingValue("PythonInterpreter.Theme") ?? nodeConfig.defaultTheme;
+        console.log("User theme:", app.ui.settings.getSettingValue("PythonInterpreter.Theme"));
         editor.setValue(savedCode);
         editor.setOptions({
           tabSize: 2,
           wrap: true,
           mode: "ace/mode/python",
-          theme: "ace/theme/github_dark",
+          theme: `ace/theme/${userTheme}`,
           showPrintMargin: false,
           showGutter: false,
           customScrollbar: true,

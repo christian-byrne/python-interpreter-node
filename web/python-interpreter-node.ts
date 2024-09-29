@@ -31,6 +31,15 @@ const PythonInterpreterExtension: ComfyExtension = {
       })
     );
   },
+  setup : async (app: ComfyApp) => {
+    const themeSelection = app.ui.settings.addSetting({
+      id: "PythonInterpreter.Theme",
+      name: "Editor Theme",
+      defaultValue: "github_dark",
+      type: "combo",
+      options: nodeConfig.themes,
+    })
+  },
   nodeCreated: async (node: LGraphNodeExtension) => {
     console.debug("[onNodeCreated Handler] Node created:", node);
   },

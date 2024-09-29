@@ -27,6 +27,15 @@ const PythonInterpreterExtension = {
             src: nodeConfig.aceLibPath,
         }));
     }),
+    setup: (app) => __awaiter(void 0, void 0, void 0, function* () {
+        const themeSelection = app.ui.settings.addSetting({
+            id: "PythonInterpreter.Theme",
+            name: "Editor Theme",
+            defaultValue: "github_dark",
+            type: "combo",
+            options: nodeConfig.themes,
+        });
+    }),
     nodeCreated: (node) => __awaiter(void 0, void 0, void 0, function* () {
         console.debug("[onNodeCreated Handler] Node created:", node);
     }),

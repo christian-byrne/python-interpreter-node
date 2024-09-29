@@ -8,22 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { nodeConfig } from "./config.js";
+import { app } from "../../scripts/app.js";
 export function initAceInstance(node, editorId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             setTimeout(() => {
-                var _a;
+                var _a, _b;
                 if (ace === null || ace === void 0 ? void 0 : ace.edit) {
                     let editor = ace.edit(editorId);
                     const savedCode = ((_a = node === null || node === void 0 ? void 0 : node.widgets_values) === null || _a === void 0 ? void 0 : _a.length)
                         ? node.widgets_values[0]
                         : nodeConfig.placeholderCode;
+                    const userTheme = (_b = app.ui.settings.getSettingValue("PythonInterpreter.Theme")) !== null && _b !== void 0 ? _b : nodeConfig.defaultTheme;
+                    console.log("User theme:", app.ui.settings.getSettingValue("PythonInterpreter.Theme"));
                     editor.setValue(savedCode);
                     editor.setOptions({
                         tabSize: 2,
                         wrap: true,
                         mode: "ace/mode/python",
-                        theme: "ace/theme/github_dark",
+                        theme: `ace/theme/${userTheme}`,
                         showPrintMargin: false,
                         showGutter: false,
                         customScrollbar: true,
