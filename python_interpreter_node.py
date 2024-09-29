@@ -8,14 +8,20 @@ from .wrappers.wrapper_abc import Wrapper
 from .wrappers.wrapper_factory import WrapperFactory
 from .streams.stream_manager import StandardStreamManager
 
-from typing import Optional, List, Union, Any, Dict, Set
+from typing import Optional, List, Any, Dict
+
 
 # From: https://github.com/pythongosssss/ComfyUI-Custom-Scripts
 class AnyType(str):
     def __ne__(self, __value: object) -> bool:
         return False
-# Our any instance wants to be a wildcard string
+
+    def __eq__(self, __value: object) -> bool:
+        return True
+
+
 any = AnyType("*")
+
 
 class PythonInterpreter:
     @classmethod
@@ -58,12 +64,12 @@ class PythonInterpreter:
                         "default": "world",
                     },
                 ),
-                "list1": ("*", {}),
-                "dict1": ("*", {}),
-                "any1": ("*", {}),
-                "any2": ("*", {}),
-                "any3": ("*", {}),
-                "any4": ("*", {}),
+                "list1": (any, {}),
+                "dict1": (any, {}),
+                "any1": (any, {}),
+                "any2": (any, {}),
+                "any3": (any, {}),
+                "any4": (any, {}),
                 "verbose": (
                     "BOOLEAN",
                     {
@@ -117,7 +123,7 @@ class PythonInterpreter:
         "any3",
         "any4",
     )
-    CATEGORY = "x"
+    CATEGORY = "DevTools"
 
     def run(
         self,
