@@ -10,12 +10,16 @@ from .streams.stream_manager import StandardStreamManager
 
 from typing import Optional, List, Union, Any, Dict, Set
 
+
 # From: https://github.com/pythongosssss/ComfyUI-Custom-Scripts
 class AnyType(str):
     def __ne__(self, __value: object) -> bool:
         return False
+
+
 # Our any instance wants to be a wildcard string
 any = AnyType("*")
+
 
 class PythonInterpreter:
     @classmethod
@@ -24,9 +28,7 @@ class PythonInterpreter:
             "required": {
                 "raw_code": (
                     "STRING",
-                    {
-                        "default": "",
-                    },
+                    {"default": ""},
                 ),
             },
             "optional": {
@@ -60,14 +62,15 @@ class PythonInterpreter:
                 ),
                 "list1": ("*", {}),
                 "dict1": ("*", {}),
-                "any1": ("*", {}),
-                "any2": ("*", {}),
-                "any3": ("*", {}),
-                "any4": ("*", {}),
+                "any1": ("*", {"tooltip": "Any non-primitive type"}),
+                "any2": ("*", {"tooltip": "Any non-primitive type"}),
+                "any3": ("*", {"tooltip": "Any non-primitive type"}),
+                "any4": ("*", {"tooltip": "Any non-primitive type"}),
                 "verbose": (
                     "BOOLEAN",
                     {
                         "default": True,
+                        "tooltip": "Whether to print full tracebacks in the output",
                     },
                 ),
             },
