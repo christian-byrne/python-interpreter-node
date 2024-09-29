@@ -1,15 +1,7 @@
-# Add when testing outside of node:
-import torch
-
-image1 = torch.randn(3, 3, 3)
-text1 = ""
-text2 = ""
-
 from sklearn.cluster import KMeans
 import webcolors
 
 
-from sklearn.cluster import KMeans
 def get_colors(image):
     pixels = image.view(-1, image.shape[-1]).numpy()  # torch already imported
     colors = KMeans(n_clusters=5).fit(pixels).cluster_centers_ * 255

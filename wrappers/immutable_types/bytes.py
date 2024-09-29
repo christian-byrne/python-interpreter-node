@@ -24,7 +24,7 @@ class BytesWrapper(Wrapper):
     def copy(self) -> "BytesWrapper":
         return self.__class__(self.data)
 
-    # The following apply to the tensor unless the wrapper has the attribute/key.
+    # The following apply to the bytes object unless the wrapper has the attribute/key.
 
     def __getattr__(self, attr):
         if attr == "parent_attributes":
@@ -51,7 +51,7 @@ class BytesWrapper(Wrapper):
         else:
             del self.data[attr]
 
-    # The following operations act as if they are the tensor.
+    # The following operations act as if they are the bytes object.
     # Listed in alphabetical order.
 
     def __abs__(self):

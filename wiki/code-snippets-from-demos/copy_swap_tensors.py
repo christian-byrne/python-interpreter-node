@@ -1,6 +1,3 @@
-
-# --- Picture: example1-with_images.png
-
 print(f"image1 shape: {image1.shape}") 
 print(f"image2 shape: {image2.shape}")
 

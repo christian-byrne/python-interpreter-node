@@ -1,5 +1,3 @@
-
-
 import random
 
 # Assume you put the colors from the previous example into the text1 input for this node

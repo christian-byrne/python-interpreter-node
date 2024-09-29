@@ -2,12 +2,26 @@
 
 ![demo video](wiki/demos/videos/demo.gif)
 
+> [!TIP]
+>  To install via manager, you must first open the ComfyUI Manager settings and set the `channel` setting to `dev`:
+>
+>
+>
+> <details>
+>
+> <summary> &nbsp; See Picture of Specified Setting </summary>
+> 
+> ![channel setting in comfyui manager](wiki/comfyui-manager-setting.png)
+>
+> </details>
+>
+
 ## Description
 
-- Write Python code in a node that executes when the workflow is queued
-- The stdout/stderr (e.g., prints, error tracebacks) are displayed in the node. 
+- Write Python code that executes when the workflow is queued
+- The stdout/err (e.g., prints, error tracebacks) are displayed in the node. 
 - The input values can be accessed by their UI name. 
-- The output values are the same as the input values, so modifications you make to the input values will be reflected in the output values.
+- The output values are the same as the input values, changes made to input values in the code are reflected in the output values.
 
 ## Requirements
 
@@ -15,20 +29,10 @@
 
 ## Installation
 
-1. `cd` int `ComfyUI/custom_nodes` directory
+1. `cd` into `ComfyUI/custom_nodes` directory
 2. `git clone` this repository
 
-## Reason to Use
-
-- Anything that can be done with Python code
-- Embedding little scripts into your saved workflows
-- Quickly make a node that can do a specialized task
-- Converting types
-- Doing math with input values
-- Debugging
-- Testing custom nodes faster.
-- Even if you can't code, you can ask ChatGPT to write a python snippet for you to accomplish a tedious task
-
+To install via ComfyUI Manager, set the `channels` setting to `dev` and search for `Python Interpreter` in the manager.
 
 ## Usage
 
@@ -38,7 +42,7 @@
     print(number1 * random.randint(0, 99))
     ```
 - The output values share the same names as the input values. Changes you make to these variables will be reflected in the output values.
-- The code will work as expected in almost all cases except for i. re-assignment and ii. passing the variables as arguments to functions.
+- The code will work as expected in almost all cases except for i. re-assignment and ii. passing the variables as arguments to external functions.
   1.  To re-assign a variable, you must use its `to()` method, regardless of the variable's type
       ```python
       # Instead of number1 = float(number1):
@@ -69,19 +73,41 @@
       print(image1) # works
       print(len(text1)) # works
       ```
-- To understand the type and shape of the input images/masks, please refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks).
+- Refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks) for info regarding types.
+- Try to avoid re-assigning the input/output variables to objects of a different type. You may lose access to some instance methods. If it must be done (e.g., to get an ouput of a novel type), just do it at the end of the code, and use your own variables in the meantime.
 
 ## Examples
 
-![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
+#### Get Complementary Colors from Image -> Interpolate into a Prompt
 
-![demo picture = caption composite](wiki/demos/pictures/new-example-caption-draw.png)
+>
+>
+> <details>
+> <summary> &nbsp; Expand Image </summary>
+>
+> 
+> ![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
+>
+> </details>
 
+#### Paste Input Text on Image
+
+>
+>
+> <details>
+> <summary> &nbsp; Expand Image </summary>
+>
+> 
+> ![demo picture = caption composite](wiki/demos/pictures/new-example-caption-draw.png)
+>
+> </details>
+
+#### Snippets
 
 - [Automatically get color palette and complements from image](wiki/code-snippets-from-demos/get_complementary_colors.py)
 - [Most recent image in folder](wiki/code-snippets-from-demos//most_recent_image_in_folder.py)
 - [Paste text on image](wiki/code-snippets-from-demos/paste_text_caption.py)
-- ...[More snippets in wiki](wiki/code-snippets-from-demos)
+- ...[More](wiki/code-snippets-from-demos)
 
 
 ----

@@ -43,7 +43,6 @@ const PythonInterpreterExtension = {
         if ((nodeData === null || nodeData === void 0 ? void 0 : nodeData.name) == nodeConfig.nodeBackendName) {
             const constructorPrototype = nodeType.prototype;
             const liteGraph = app.graph;
-            // Create ace-editor DOM elements and listeners.
             constructorPrototype.onNodeCreated = function () {
                 const nodePrototype = this;
                 if (nodePrototype.title == nodeConfig.nodeTitle) {
@@ -54,10 +53,8 @@ const PythonInterpreterExtension = {
                     createAceDomElements(nodePrototype, editorId);
                 }
             };
-            // Add a new widget to display the stdout/stderr after execution.
             constructorPrototype.onExecuted = function (data) {
                 const node = this;
-                console.debug("[onExecuted handler] Node executed:", node);
                 if (node.widgets) {
                     appendStdoutWidget(node, liteGraph, data);
                 }

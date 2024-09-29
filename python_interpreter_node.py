@@ -8,17 +8,26 @@ from .wrappers.wrapper_abc import Wrapper
 from .wrappers.wrapper_factory import WrapperFactory
 from .streams.stream_manager import StandardStreamManager
 
-from typing import Optional, List, Union, Any, Dict
+from typing import Optional, List, Union, Any, Dict, Set
 
+# From: https://github.com/pythongosssss/ComfyUI-Custom-Scripts
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+# Our any instance wants to be a wildcard string
+any = AnyType("*")
 
 class PythonInterpreter:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "raw_code": ("STRING",{
-                    "default": "",
-                }),
+                "raw_code": (
+                    "STRING",
+                    {
+                        "default": "",
+                    },
+                ),
             },
             "optional": {
                 "image1": ("IMAGE",),
@@ -49,16 +58,12 @@ class PythonInterpreter:
                         "default": "world",
                     },
                 ),
-                "list1": (
-                    "ANY",
-                    {},
-                ),
-                "list2": (
-                    "ANY",
-                    {},
-                ),
-                "dict1": ("ANY", {}),
-                "dict2": ("ANY", {}),
+                "list1": ("*", {}),
+                "dict1": ("*", {}),
+                "any1": ("*", {}),
+                "any2": ("*", {}),
+                "any3": ("*", {}),
+                "any4": ("*", {}),
                 "verbose": (
                     "BOOLEAN",
                     {
@@ -81,18 +86,20 @@ class PythonInterpreter:
     FUNCTION = "run"
     OUTPUT_NODE = True
     RETURN_TYPES = (
-        "IMAGE",
-        "IMAGE",
-        "MASK",
-        "MASK",
-        "NUMBER",
-        "NUMBER",
-        "STRING",
-        "STRING",
-        "ANY",
-        "ANY",
-        "ANY",
-        "ANY",
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
+        any,
     )
     RETURN_NAMES = (
         "image1",
@@ -104,32 +111,36 @@ class PythonInterpreter:
         "text1",
         "text2",
         "list1",
-        "list2",
         "dict1",
-        "dict2",
+        "any1",
+        "any2",
+        "any3",
+        "any4",
     )
     CATEGORY = "x"
 
     def run(
         self,
         raw_code: str = "",
-        image1: Optional[torch.Tensor] = None,
-        image2: Optional[torch.Tensor] = None,
-        mask1: Optional[torch.Tensor] = None,
-        mask2: Optional[torch.Tensor] = None,
-        number1: Optional[Union[float, int, complex]] = None,
-        number2: Optional[Union[float, int, complex]] = None,
-        text1: Optional[str] = None,
-        text2: Optional[str] = None,
-        list1: Optional[Union[List, str, Any]] = None,
-        list2: Optional[Union[List, str, Any]] = None,
-        dict1: Optional[Union[dict, str, Any]] = None,
-        dict2: Optional[Union[dict, str, Any]] = None,
+        image1: Optional[torch.Tensor] = torch.rand([1, 32, 32, 3]),
+        image2: Optional[torch.Tensor] = torch.rand([1, 32, 32, 3]),
+        mask1: Optional[torch.Tensor] = torch.rand([1, 32, 32]),
+        mask2: Optional[torch.Tensor] = torch.rand([1, 32, 32]),
+        number1: Optional[float] = 0.0,
+        number2: Optional[int] = 0,
+        text1: Optional[str] = "hello",
+        text2: Optional[str] = "world",
+        list1: Optional[List[Any]] = [1],
+        dict1: Optional[Dict[str, Any]] = {"key": 1},
+        any1: Optional[Any] = torch.rand([1, 32, 32, 3]),
+        any2: Optional[Any] = torch.rand([1, 32, 32, 3]),
+        any3: Optional[Any] = torch.rand([1, 32, 32, 3]),
+        any4: Optional[Any] = torch.rand([1, 32, 32, 3]),
         verbose: bool = True,
         output_text: str = "",
         unique_id=None,
         extra_pnginfo=None,
-    ):
+    ) -> Dict[str, Any]:
         self.image1 = WrapperFactory(image1)
         self.image2 = WrapperFactory(image2)
         self.mask1 = WrapperFactory(mask1)
@@ -139,9 +150,11 @@ class PythonInterpreter:
         self.text1 = WrapperFactory(text1)
         self.text2 = WrapperFactory(text2)
         self.list1 = WrapperFactory(list1)
-        self.list2 = WrapperFactory(list2)
         self.dict1 = WrapperFactory(dict1)
-        self.dict2 = WrapperFactory(dict2)
+        self.any1 = WrapperFactory(any1)
+        self.any2 = WrapperFactory(any2)
+        self.any3 = WrapperFactory(any3)
+        self.any4 = WrapperFactory(any4)
 
         self.shared_ref_dict = self.__map_ref_dict(
             [
@@ -154,9 +167,11 @@ class PythonInterpreter:
                 "text1",
                 "text2",
                 "list1",
-                "list2",
                 "dict1",
-                "dict2",
+                "any1",
+                "any2",
+                "any3",
+                "any4",
             ]
         )
         self.out_streams = StandardStreamManager(verbose)

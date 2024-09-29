@@ -1,7 +1,7 @@
 [project]
 name = "python-interpreter-node"
 description = "Python interpreter to embed scripts into workflows and debug custom nodes."
-version = "1.0.0"
+version = "1.2.3"
 license = "LICENSE"
 dependencies = ["Pillow>=10.3.0"]
 
@@ -12,4 +12,4 @@ Repository = "https://github.com/christian-byrne/python-interpreter-node"
 [tool.comfy]
 PublisherId = "christian-byrne"
 DisplayName = "python-interpreter-node"
-Icon = ""
+Icon = "https://img.icons8.com/?size=100&id=121465&format=png&color=000000"
