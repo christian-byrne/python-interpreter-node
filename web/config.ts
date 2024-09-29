@@ -6,7 +6,6 @@ export const nodeConfig = {
   graphName: "Python Interpreter Node",
   codeEditorId: "python_code",
   hiddenInputId: "raw_code",
-  aceScriptId: "ace-script-python-interpreter-node",
   stdoutErrId: "output_text",
   placeholderCode: `"""Docs: https://github.com/christian-byrne/python-interpreter-node"""
 

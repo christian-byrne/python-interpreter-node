@@ -11,6 +11,16 @@ import { appendStdoutWidget } from "./append-stdout.js";
 import { nodeConfig } from "./config.js";
 
 declare var ace: Ace;
+const ACTIVE_EDITORS = {};
+
+const createUniqueID = (): string => {
+  let id = Math.random().toString(36).substring(2, 9);
+  while (ACTIVE_EDITORS[id]) {
+    id = Math.random().toString(36).substring(2, 9);
+  }
+  ACTIVE_EDITORS[id] = true;
+  return id;
+}
 
 const PythonInterpreterExtension: ComfyExtension = {
   name: nodeConfig.graphName,
@@ -20,6 +30,9 @@ const PythonInterpreterExtension: ComfyExtension = {
         src: nodeConfig.aceLibPath,
       })
     );
+  },
+  nodeCreated: async (node: LGraphNodeExtension) => {
+    console.debug("[onNodeCreated Handler] Node created:", node);
   },
   beforeRegisterNodeDef: async (
     nodeType: NodeType,
@@ -32,11 +45,13 @@ const PythonInterpreterExtension: ComfyExtension = {
 
       // Create ace-editor DOM elements and listeners.
       constructorPrototype.onNodeCreated = function () {
-        const node: LGraphNodeExtension = this;
-        console.debug("[onNodeCreated Handler] Node created:", node);
-        if (node.title == nodeConfig.nodeTitle) {
-          initAceInstance();
-          createAceDomElements(node);
+        const nodePrototype: LGraphNodeExtension = this;
+        if (nodePrototype.title == nodeConfig.nodeTitle) {
+          const editorId = createUniqueID();
+          console.debug("[onNodeCreated Handler] Node created:", nodePrototype);
+          console.debug("[onNodeCreated Handler] Editor ID:", editorId);
+          initAceInstance(nodePrototype, editorId);
+          createAceDomElements(nodePrototype, editorId);
         }
       };
 

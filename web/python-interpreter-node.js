@@ -11,6 +11,15 @@ import { app } from "../../scripts/app.js";
 import { initAceInstance, createAceDomElements } from "./ace-editor.js";
 import { appendStdoutWidget } from "./append-stdout.js";
 import { nodeConfig } from "./config.js";
+const ACTIVE_EDITORS = {};
+const createUniqueID = () => {
+    let id = Math.random().toString(36).substring(2, 9);
+    while (ACTIVE_EDITORS[id]) {
+        id = Math.random().toString(36).substring(2, 9);
+    }
+    ACTIVE_EDITORS[id] = true;
+    return id;
+};
 const PythonInterpreterExtension = {
     name: nodeConfig.graphName,
     init: (app) => __awaiter(void 0, void 0, void 0, function* () {
@@ -18,17 +27,22 @@ const PythonInterpreterExtension = {
             src: nodeConfig.aceLibPath,
         }));
     }),
+    nodeCreated: (node) => __awaiter(void 0, void 0, void 0, function* () {
+        console.debug("[onNodeCreated Handler] Node created:", node);
+    }),
     beforeRegisterNodeDef: (nodeType, nodeData, app) => __awaiter(void 0, void 0, void 0, function* () {
         if ((nodeData === null || nodeData === void 0 ? void 0 : nodeData.name) == nodeConfig.nodeBackendName) {
             const constructorPrototype = nodeType.prototype;
             const liteGraph = app.graph;
             // Create ace-editor DOM elements and listeners.
             constructorPrototype.onNodeCreated = function () {
-                const node = this;
-                console.debug("[onNodeCreated Handler] Node created:", node);
-                if (node.title == nodeConfig.nodeTitle) {
-                    initAceInstance();
-                    createAceDomElements(node);
+                const nodePrototype = this;
+                if (nodePrototype.title == nodeConfig.nodeTitle) {
+                    const editorId = createUniqueID();
+                    console.debug("[onNodeCreated Handler] Node created:", nodePrototype);
+                    console.debug("[onNodeCreated Handler] Editor ID:", editorId);
+                    initAceInstance(nodePrototype, editorId);
+                    createAceDomElements(nodePrototype, editorId);
                 }
             };
             // Add a new widget to display the stdout/stderr after execution.

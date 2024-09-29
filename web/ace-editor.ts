@@ -1,18 +1,21 @@
 import { Ace } from "./types/ace.js";
-import { getWorkflowNodeByName } from "./get-workflow-data.js";
 import { nodeConfig } from "./config.js";
 import { LGraphNodeExtension } from "./types/comfy-app.js";
 
 declare var ace: Ace;
 
-export async function initAceInstance() {
+export async function initAceInstance(
+  node: LGraphNodeExtension,
+  editorId: string
+) {
   try {
     setTimeout(() => {
       if (ace?.edit) {
-        console.debug(
-          "[onNodeCreated handler] Initializing ace editor for python code node"
-        );
-        let editor = ace.edit(nodeConfig.codeEditorId);
+        let editor = ace.edit(editorId);
+        const savedCode = node?.widgets_values?.length
+          ? node.widgets_values[0]
+          : nodeConfig.placeholderCode;
+        editor.setValue(savedCode);
         editor.setOptions({
           tabSize: 2,
           wrap: true,
@@ -24,7 +27,6 @@ export async function initAceInstance() {
           enableAutoIndent: true,
         });
         ace.require("ace/ext/language_tools");
-        ace.require("ace/ext/searchbox");
       }
     }, 128);
   } catch (e) {
@@ -33,34 +35,15 @@ export async function initAceInstance() {
       e
     );
   }
-
-  // Load code from workflow into editor. Call aftering rendering so all node props are defined.
-  let savedSession: boolean = false;
-  const workflow = await getWorkflowNodeByName(nodeConfig.nodeBackendName);
-  if (workflow) {
-    // The raw_code widget is the hidden input widget at position 0 (top)
-    const persistentCode = workflow?.widgets_values[0];
-    if (
-      persistentCode &&
-      persistentCode.replace(/\s/g, "") !== "" &&
-      persistentCode !== nodeConfig.placeholderCode
-    ) {
-      console.info(
-        "[setup] Persistent Python Code session detected. Loading from history"
-      );
-      savedSession = !savedSession;
-      ace.edit(nodeConfig.codeEditorId).setValue(persistentCode);
-    }
-    if (!savedSession) {
-      ace.edit(nodeConfig.codeEditorId).setValue(nodeConfig.placeholderCode);
-    }
-  }
 }
 
-export async function createAceDomElements(node: LGraphNodeExtension) {
+export async function createAceDomElements(
+  node: LGraphNodeExtension,
+  editorId: string
+) {
+  // Create ace editor container element
   const acePythonContainer = Object.assign(document.createElement("div"), {
-    id: nodeConfig.codeEditorId,
-    textContent: nodeConfig.placeholderCode, // most likely can remove this
+    id: editorId,
     style: {
       width: "100%",
       height: "100%",
@@ -70,35 +53,37 @@ export async function createAceDomElements(node: LGraphNodeExtension) {
 
   // Add ace editor container to the node on creation
   if (node.addDOMWidget !== undefined) {
-    node.addDOMWidget(
-      nodeConfig.codeEditorId,
-      "customtext",
-      acePythonContainer,
-      {
-        getValue: function () {
-          try {
-            if (ace?.edit) {
-              return ace.edit(nodeConfig.codeEditorId).getValue();
-            }
-          } catch (e) {
-            console.debug(
-              "[onNodeCreated handler] Error trying to get value from ace editor for python code node",
-              e
-            );
+    node.addDOMWidget(editorId, "customtext", acePythonContainer, {
+      getValue: function () {
+        try {
+          if (ace?.edit) {
+            return ace.edit(editorId).getValue();
           }
-        },
-      }
-    );
+        } catch (e) {
+          console.debug(
+            "[onNodeCreated handler] Error trying to get value from ace editor for python code node",
+            e
+          );
+        }
+      },
+    });
   }
 
   // Mirror code editor text to hidden input widget
-  if (ace?.edit) {
-    ace
-      .edit(nodeConfig.codeEditorId)
-      .getSession()
-      .on("change", (e: Event) => {
-        node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value =
-          ace.edit(nodeConfig.codeEditorId).getValue();
-      });
+  try {
+    if (ace?.edit) {
+      ace
+        .edit(editorId)
+        .getSession()
+        .on("change", (e: Event) => {
+          node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value =
+            ace.edit(editorId).getValue();
+        });
+    }
+  } catch (e) {
+    console.debug(
+      "[onNodeCreated handler] Error trying to mirror code editor text to hidden input widget",
+      e
+    );
   }
 }
