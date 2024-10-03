@@ -8,7 +8,8 @@ from .wrappers.wrapper_abc import Wrapper
 from .wrappers.wrapper_factory import WrapperFactory
 from .streams.stream_manager import StandardStreamManager
 
-from typing import Optional, List, Union, Any, Dict, Set
+from typing import Optional, List, Any, Dict
+
 
 
 # From: https://github.com/pythongosssss/ComfyUI-Custom-Scripts
@@ -16,8 +17,10 @@ class AnyType(str):
     def __ne__(self, __value: object) -> bool:
         return False
 
+    def __eq__(self, __value: object) -> bool:
+        return True
 
-# Our any instance wants to be a wildcard string
+
 any = AnyType("*")
 
 
@@ -60,12 +63,12 @@ class PythonInterpreter:
                         "default": "world",
                     },
                 ),
-                "list1": ("*", {}),
-                "dict1": ("*", {}),
-                "any1": ("*", {"tooltip": "Any non-primitive type"}),
-                "any2": ("*", {"tooltip": "Any non-primitive type"}),
-                "any3": ("*", {"tooltip": "Any non-primitive type"}),
-                "any4": ("*", {"tooltip": "Any non-primitive type"}),
+                "list1": (any, {}),
+                "dict1": (any, {}),
+                "any1": (any, {}),
+                "any2": (any, {}),
+                "any3": (any, {}),
+                "any4": (any, {}),
                 "verbose": (
                     "BOOLEAN",
                     {
@@ -120,7 +123,7 @@ class PythonInterpreter:
         "any3",
         "any4",
     )
-    CATEGORY = "x"
+    CATEGORY = "DevTools"
 
     def run(
         self,
