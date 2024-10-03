@@ -11,7 +11,6 @@ from .streams.stream_manager import StandardStreamManager
 from typing import Optional, List, Any, Dict
 
 
-
 # From: https://github.com/pythongosssss/ComfyUI-Custom-Scripts
 class AnyType(str):
     def __ne__(self, __value: object) -> bool:
