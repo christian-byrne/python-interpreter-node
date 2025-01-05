@@ -73,7 +73,7 @@ To install via ComfyUI Manager, set the `channels` setting to `dev` and search f
       print(image1) # works
       print(len(text1)) # works
       ```
-- Refer to the [Images, Latents, and Masks section of comfydocs.org](https://www.comfydocs.org/essentials/custom_node_images_and_masks) for info regarding types.
+- Refer to the [Images, Latents, and Masks section of comfydocs.org](https://docs.comfy.org/essentials/custom_node_images_and_masks) for info regarding types.
 - Try to avoid re-assigning the input/output variables to objects of a different type. You may lose access to some instance methods. If it must be done (e.g., to get an ouput of a novel type), just do it at the end of the code, and use your own variables in the meantime.
 
 ## Examples
