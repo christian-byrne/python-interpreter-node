@@ -1,7 +1,7 @@
 [project]
 name = "python-interpreter-node"
 description = "Python interpreter to embed scripts into workflows and debug custom nodes."
-version = "2.0.1"
+version = "2.1.0"
 license = "LICENSE"
 dependencies = ["Pillow>=10.3.0"]
 
