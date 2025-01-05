@@ -1,6 +1,6 @@
 # Python Interpreter ComfyUI Node 🐍
 
-![demo video](wiki/demos/videos/demo.gif)
+![demo video](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/demos/videos/demo.gif?raw=true)
 
 > [!TIP]
 >  To install via manager, you must first open the ComfyUI Manager settings and set the `channel` setting to `dev`:
@@ -11,7 +11,7 @@
 >
 > <summary> &nbsp; See Picture of Specified Setting </summary>
 > 
-> ![channel setting in comfyui manager](wiki/comfyui-manager-setting.png)
+> ![channel setting in comfyui manager](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/comfyui-manager-setting.png?raw=true)
 >
 > </details>
 >
@@ -86,7 +86,7 @@ To install via ComfyUI Manager, set the `channels` setting to `dev` and search f
 > <summary> &nbsp; Expand Image </summary>
 >
 > 
-> ![demo picture - complementary color palette](wiki/demos/pictures/new-example-complementary-colors.png)
+> ![demo picture - complementary color palette](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/demos/pictures/new-example-complementary-colors.png?raw=true)
 >
 > </details>
 
@@ -98,16 +98,16 @@ To install via ComfyUI Manager, set the `channels` setting to `dev` and search f
 > <summary> &nbsp; Expand Image </summary>
 >
 > 
-> ![demo picture = caption composite](wiki/demos/pictures/new-example-caption-draw.png)
+> ![demo picture = caption composite](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/demos/pictures/new-example-caption-draw.png?raw=true)
 >
 > </details>
 
 #### Snippets
 
-- [Automatically get color palette and complements from image](wiki/code-snippets-from-demos/get_complementary_colors.py)
-- [Most recent image in folder](wiki/code-snippets-from-demos//most_recent_image_in_folder.py)
-- [Paste text on image](wiki/code-snippets-from-demos/paste_text_caption.py)
-- ...[More](wiki/code-snippets-from-demos)
+- [Automatically get color palette and complements from image](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/code-snippets-from-demos/get_complementary_colors.py)
+- [Most recent image in folder](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/code-snippets-from-demos/most_recent_image_in_folder.py)
+- [Paste text on image](https://github.com/christian-byrne/python-interpreter-node/blob/demo-files/wiki/code-snippets-from-demos/paste_text_caption.py)
+- ...[More](https://github.com/christian-byrne/python-interpreter-node/tree/demo-files/wiki/code-snippets-from-demos)
 
 
 ----
