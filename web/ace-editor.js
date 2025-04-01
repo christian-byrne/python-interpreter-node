@@ -68,19 +68,23 @@ export function createAceDomElements(node, editorId) {
             });
         }
         // Mirror code editor text to hidden input widget
+        function waitForElement(){
+            ace
+                .edit(editorId)
+                .getSession()
+                .on("change", (e) => {
+                node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value =
+                    ace.edit(editorId).getValue();
+            });
+        }
+        //wait for ace editor to be loaded and ready
+
         try {
-            if (ace === null || ace === void 0 ? void 0 : ace.edit) {
-                ace
-                    .edit(editorId)
-                    .getSession()
-                    .on("change", (e) => {
-                    node.widgets.find((w) => w.name === nodeConfig.hiddenInputId).value =
-                        ace.edit(editorId).getValue();
-                });
-            }
+            waitForElement();
         }
         catch (e) {
-            console.debug("[onNodeCreated handler] Error trying to mirror code editor text to hidden input widget", e);
+            console.debug("[onNodeCreated handler] Error trying to mirror code editor text to hidden input widget,try again after 1s", e);
+            setTimeout(waitForElement,1000);
         }
     });
 }
